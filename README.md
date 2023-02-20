@@ -1,6 +1,10 @@
-Florian Rosenberger et al.
+Florian Rosenberger et al., 2023 - in revision
 
 # Spatial single-cell mass spectrometry defines zonation of the hepatocyte proteome
+
+### Abstract
+
+Single-cell proteomics by mass spectrometry (MS) is emerging as a powerful and unbiased method for the characterization of biological heterogeneity. So far, it has been limited to cultured cells, whereas an expansion of the method to complex tissues would greatly enhance biological insights. Here we describe single-cell Deep Visual Proteomics (scDVP), a technology that integrates high-content imaging, laser microdissection and multiplexed MS. scDVP resolves the context-dependent, spatial proteome of murine hepatocytes at a current depth of 1,700 proteins from a slice of a cell. Half of the proteome was differentially regulated in a spatial manner, with protein levels changing dramatically in proximity to the central vein. We applied machine learning to proteome classes and images, which subsequently inferred the spatial proteome from imaging data alone. scDVP is applicable to healthy and diseased tissues and complements other spatial proteomics or spatial omics technologies.
 
 ### Table of contents
 
