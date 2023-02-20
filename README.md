@@ -2,6 +2,8 @@ Florian Rosenberger et al., 2023 - in revision
 
 # Spatial single-cell mass spectrometry defines zonation of the hepatocyte proteome
 
+Here could be a nice staining picture or a graphical abstract
+
 ## Abstract
 
 Single-cell proteomics by mass spectrometry (MS) is emerging as a powerful and unbiased method for the characterization of biological heterogeneity. So far, it has been limited to cultured cells, whereas an expansion of the method to complex tissues would greatly enhance biological insights. Here we describe single-cell Deep Visual Proteomics (scDVP), a technology that integrates high-content imaging, laser microdissection and multiplexed MS. scDVP resolves the context-dependent, spatial proteome of murine hepatocytes at a current depth of 1,700 proteins from a slice of a cell. Half of the proteome was differentially regulated in a spatial manner, with protein levels changing dramatically in proximity to the central vein. We applied machine learning to proteome classes and images, which subsequently inferred the spatial proteome from imaging data alone. scDVP is applicable to healthy and diseased tissues and complements other spatial proteomics or spatial omics technologies.
@@ -18,16 +20,18 @@ Single-cell proteomics by mass spectrometry (MS) is emerging as a powerful and u
 Processed mass spectrometry raw data and other input files have been saved in the following folders:
 
 - [data](/data/)
+- (Substructures can be created in this folder. Once this is done, I can create a more detailed overview here for you)
 
 ## Results
 
 Figures and result dataframes are saved in the [output](/output/) folder. 
 
+- (Substructures can be created in this folder. Once this is done, I can create a more detailed overview here for you)
 
 ## R scripts
 
-
-
+- An exemplary script is saved. We could keep all headers of the R scripts consistent, thereby providing a short overview of the aim and content of each file. 
+- Additonally, the header contains a function that is referring the folder structure of each script to the respective local copies of the GitHub folder. This means that anyone who will download the folder can run the scripts. Here, the data will be taken from the data folder and the output will be saved in the output folder. 
 
 ## GitHub Notes
 
