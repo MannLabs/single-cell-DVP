@@ -33,9 +33,14 @@ Figures and result dataframes are saved in the [output](/output/) folder.
 
 ## R scripts
 
-[...]
+### Scripts for main figures:
 
-- [Script Figure 2](Histone-levels.R)
+#### Figure 2
+- [Figure 2](Histone-levels.R)
+#### Figure 3
+- [Figure 3a, PCA with distance metric overlay](PCA_vs_geometric-distance.R)
+- [Figure 3b, Distance metric versus PC1](PCA_vs_geometric-distance.R)
+#### Figure 4
 - [Script - Supplementary_Figure_6](Supplementary_Figure_6.R)
 
 - [Template](Template.R)
