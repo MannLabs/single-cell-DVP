@@ -44,12 +44,17 @@ Update current status:
 Push changes by indicating the date of change and editor (e.g.: Florian Rosenberger on Feb 20 e.g. 20230220_FR)
 
 1. Get the path of you local GitHub folder
+
 `P:\03_Experiments\24_Borderline_Project\18_Github\Borderline_Manuscript>git init`
 
 2. Add files and commit changes:
+
 `>git add .`
+
 `>git commit -m "20230220_Editor"`
+
 `>git remote -v`
+
 `>git push origin main`
 
 
