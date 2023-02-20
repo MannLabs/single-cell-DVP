@@ -39,7 +39,7 @@ Figures and result dataframes are saved in the [output](/output/) folder.
 - 
 ### Scripts for main figures
 #### Figure 2, Depth of single shape proteomes and estimation of nuclear compartment
-- [Figure 2](Histone-levels.R)
+- [Figure 2, Intensity of top four histones](Histone-levels.R)
 #### Figure 3, Single shape proteomes are accurate descriptors of zonated hepatocytes
 - [Figure 3a, PCA with distance metric overlay](PCA_vs_geometric-distance.R)
 - [Figure 3b, Distance metric versus PC1](PCA_vs_geometric-distance.R)
@@ -47,7 +47,7 @@ Figures and result dataframes are saved in the [output](/output/) folder.
 - [Figure 4a, Pseudo-FACS plot](Pseudo-FACS.R)
 - [Figure 4b, Proteome bin versus staining intensity](Pseudo-FACS.R)
 - [Figure 4e, Proteome prediction of an unseen section](Prediction_new_mouse.R)
-- 
+
 ### Scripts for supplementary figures
 #### Supplementary Figure S3: Performance overview of single shape proteomes
 - [Figure S3a, Labelling efficiency](Labelling-efficiency.R)
