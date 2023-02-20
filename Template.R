@@ -54,6 +54,6 @@ if (setup == "yes") {
 
 setwd(dirname(getActiveDocumentContext()$path))   
 
-# save by:
-# "output/",Technology ,"/",current_dataset,"/
+# load input and save all output using the following path:
+#paste0("output/",current_dataset,"/Filename.png)
 
