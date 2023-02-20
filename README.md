@@ -36,7 +36,7 @@ Figures and result dataframes are saved in the [output](/output/) folder.
 ### Data wrangling scripts
 - [Filtering criteria](Data-wrangling.R)
 - [Prediction proteome calculation](Prediction_class_proteomes.R)
-- 
+
 ### Scripts for main figures
 #### Figure 2, Depth of single shape proteomes and estimation of nuclear compartment
 - [Figure 2, Intensity of top four histones](Histone-levels.R)
