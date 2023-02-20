@@ -35,7 +35,7 @@ Figures and result dataframes are saved in the [output](/output/) folder.
 
 [...]
 
-- [Supplementary_Figure_6](Supplementary_Figure_6.R)
+- [Script - Supplementary_Figure_6](Supplementary_Figure_6.R)
 
 - [Template](Template.R)
 
