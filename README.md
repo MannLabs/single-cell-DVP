@@ -35,6 +35,7 @@ Figures and result dataframes are saved in the [output](/output/) folder.
 
 [...]
 
+- [Script Figure 2](Histone-levels.R)
 - [Script - Supplementary_Figure_6](Supplementary_Figure_6.R)
 
 - [Template](Template.R)
