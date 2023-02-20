@@ -17,7 +17,7 @@ Single-cell proteomics by mass spectrometry (MS) is emerging as a powerful and u
 
 ## Data repository
 
-Processed mass spectrometry raw data and other input files have been saved in the following folders:
+Processed mass spectrometry raw data and other [input](/input/) files have been saved in the following folders:
 
 - [Data - Supplementary_Figure_6](/data/Supplementary_Figure_6)
 
