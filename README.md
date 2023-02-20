@@ -19,16 +19,25 @@ Single-cell proteomics by mass spectrometry (MS) is emerging as a powerful and u
 
 Processed mass spectrometry raw data and other input files have been saved in the following folders:
 
-- [data](/data/)
+- [Data - Supplementary_Figure_6](/data/Supplementary_Figure_6)
+
 - (Substructures can be created in this folder. Once this is done, I can create a more detailed overview here for you)
 
 ## Results
 
 Figures and result dataframes are saved in the [output](/output/) folder. 
 
+- [Results - Supplementary_Figure_6](/output/Supplementary_Figure_6)
+
 - (Substructures can be created in this folder. Once this is done, I can create a more detailed overview here for you)
 
 ## R scripts
+
+[...]
+
+- [Supplementary_Figure_6](Supplementary_Figure_6.R)
+
+- [Template](Template.R)
 
 - An exemplary script is saved. We could keep all headers of the R scripts consistent, thereby providing a short overview of the aim and content of each file. 
 - Additonally, the header contains a function that is referring the folder structure of each script to the respective local copies of the GitHub folder. This means that anyone who will download the folder can run the scripts. Here, the data will be taken from the data folder and the output will be saved in the output folder. 
