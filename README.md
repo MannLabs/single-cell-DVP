@@ -27,45 +27,45 @@ Processed mass spectrometry raw data and other [input](/input/) files have been 
 
 Figures and result dataframes are saved in the [output](/output/) folder. 
 
-- [Results - Supplementary_Figure_6](/output/Supplementary_Figure_6)
+- [Results - Supplementary_Figure_6](/output/Figures/Supplementary_Figure_6)
 
 - (Substructures can be created in this folder. Once this is done, I can create a more detailed overview here for you)
 
 ## R scripts
 
 ### Data wrangling scripts
-- [Filtering criteria](Data-wrangling.R)
-- [Prediction proteome calculation](Prediction_class_proteomes.R)
+- [Filtering criteria](R_scripts/Data-wrangling.R)
+- [Prediction proteome calculation](R_scripts/Prediction_class_proteomes.R)
 
 ### Scripts for main figures
 #### Figure 2, Depth of single shape proteomes and estimation of nuclear compartment
-- [Figure 2, Intensity of top four histones](Histone-levels.R)
+- [Figure 2, Intensity of top four histones](R_scripts/Histone-levels.R)
 #### Figure 3, Single shape proteomes are accurate descriptors of zonated hepatocytes
-- [Figure 3a, PCA with distance metric overlay](PCA_vs_geometric-distance.R)
-- [Figure 3b, Distance metric versus PC1](PCA_vs_geometric-distance.R)
+- [Figure 3a, PCA with distance metric overlay](R_scripts/PCA_vs_geometric-distance.R)
+- [Figure 3b, Distance metric versus PC1](R_scripts/PCA_vs_geometric-distance.R)
 #### Figure 4, Combining imaging and proteome data for a machine-learned model
-- [Figure 4a, Pseudo-FACS plot](Pseudo-FACS.R)
-- [Figure 4b, Proteome bin versus staining intensity](Pseudo-FACS.R)
-- [Figure 4e, Proteome prediction of an unseen section](Prediction_new_mouse.R)
+- [Figure 4a, Pseudo-FACS plot](R_scripts/Pseudo-FACS.R)
+- [Figure 4b, Proteome bin versus staining intensity](R_scripts/Pseudo-FACS.R)
+- [Figure 4e, Proteome prediction of an unseen section](R_scripts/Prediction_new_mouse.R)
 
 ### Scripts for supplementary figures
 #### Supplementary Figure S3: Performance overview of single shape proteomes
-- [Figure S3a, Labelling efficiency](Labelling-efficiency.R)
-- [Figure S3b, Protein IDs per biological replicate](Protein-IDs_vs_Runs.R)
-- [Figure S3c, Abundance range and transcription factors](Rank_versus_Intensity.R)
-- [Figure S3d, Microdissected area versus protein IDs](Protein-IDs_vs_Area.R)
-- [Figure S3e, Data completeness versus intensity](Completeness_vs_Intensity.R)
-- [Figure S3f, Normalization versus CVs](CVs.R)
+- [Figure S3a, Labelling efficiency](R_scripts/Labelling-efficiency.R)
+- [Figure S3b, Protein IDs per biological replicate](R_scripts/Protein-IDs_vs_Runs.R)
+- [Figure S3c, Abundance range and transcription factors](RR_scripts/ank_versus_Intensity.R)
+- [Figure S3d, Microdissected area versus protein IDs](R_scripts/Protein-IDs_vs_Area.R)
+- [Figure S3e, Data completeness versus intensity](R_scripts/Completeness_vs_Intensity.R)
+- [Figure S3f, Normalization versus CVs](R_scripts/CVs.R)
 
 #### Supplementary Figure S4: Dimensionality reduction of single shape data
-- [Figure S4a, PCA with Ass1 expression levels](PCA_Hepatocytes.R)
-- [Figure S4b, PCA with Cyp2e1 expression levels](PCA_Hepatocytes.R)
-- [Figure S4c, Distance metric versus PC12](PCA_vs_geometric-distance.R)
-- [Figure S4d, PCA with loadings](PCA_Hepatocytes.R)
-- [Figure S4e, PCA including endothelial cells](PCA_Endothelial.R)
+- [Figure S4a, PCA with Ass1 expression levels](R_scripts/PCA_Hepatocytes.R)
+- [Figure S4b, PCA with Cyp2e1 expression levels](R_scripts/PCA_Hepatocytes.R)
+- [Figure S4c, Distance metric versus PC12](R_scripts/PCA_vs_geometric-distance.R)
+- [Figure S4d, PCA with loadings](R_scripts/PCA_Hepatocytes.R)
+- [Figure S4e, PCA including endothelial cells](R_scripts/PCA_Endothelial.R)
 
 #### Supplementart Figure S6
-- [Script - Supplementary_Figure_6](Supplementary_Figure_6.R)
+- [Script - Supplementary_Figure_6](R_scripts/Supplementary_Figure_6.R)
 
 - [Template](Template.R)
 
