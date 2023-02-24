@@ -21,7 +21,7 @@ read_csv("../data/kmeans_5_cluster.csv") %>%
                    ifelse(cluster == 2, 5, 1))))) -> NN_classes #Rename classes in spatially correct order
 
 
-SA_incl_NN <- length(unique(NN_classes$cell_ID)) 
+SA_incl_NN <- length(unique(d$cell_ID)) 
 
 d %>%
   filter(cell_ID %in% NN_classes$cell_ID) %>%

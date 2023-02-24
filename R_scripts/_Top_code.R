@@ -10,7 +10,14 @@ rm(list=ls())
 
 ## -- Package setup
 
-packages <- c("rstudioapi", "tidyverse", "WebGestaltR", "limma", "org.Mm.eg.db", "viridis", "ggrepel")
+packages <- c("rstudioapi",
+              "tidyverse",
+              "WebGestaltR",
+              "limma",
+              "org.Mm.eg.db",
+              "viridis",
+              "ggrepel",
+              "pheatmap")
 
 for (p in packages) {
   if (!require(p, character.only = TRUE)) {
@@ -40,3 +47,4 @@ source("./Protein-IDs_vs_Runs.R")
 source("./Pseudo-FACS.R")
 source("./Prediction_class_proteomes.R")
 source("./Prediction_new_mouse.R")
+source("./Heatmap_global.R")

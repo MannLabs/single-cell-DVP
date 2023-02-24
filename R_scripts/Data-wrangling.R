@@ -34,9 +34,11 @@ meta_distances <- read_csv("../data/meta_img-geometric-distance.csv") %>%
 ## Read proteomics data
 label_pattern = "\\(Dimethyl-n-[0-9]+\\)"
 
-read_tsv("../Data/c839be2a6a097efbafad20c82adda223_TO_CONSTANTIN__scDVP_full_report.tsv.precursortable_uncorrected.tsv.formatted_for_iq.tsv.maxlfq_iq_protein_intensities.tsv.linearized.tsv") %>%
+read_tsv("../Data/89f5921594c92799946e67301cc9f12b_scDVP_refquant_corrected.formatted_for_iq.tsv.maxlfq_iq_protein_intensities.tsv") %>%
   gather(R.FileName, int, !protein) %>%
   mutate(int = na_if(int, 0)) %>%
+  drop_na(int) %>%
+  mutate(int = as.numeric(int)) %>%
   mutate(run_ID = paste(str_replace_all(str_replace_all(R.FileName, ".*scDVP_", ""), "_.*", ""),
                         str_replace_all(str_replace_all(R.FileName, ".*AID8_", ""), "_.*", ""),
                         sep = "_")) %>%
@@ -46,6 +48,11 @@ read_tsv("../Data/c839be2a6a097efbafad20c82adda223_TO_CONSTANTIN__scDVP_full_rep
   mutate(bio_ID = str_replace(cell_ID, "_.*", "")) %>%
   mutate(tube_ID = str_replace(run_ID, ".*_", "")) %>%
   dplyr::rename(Protein = protein) -> d_full_set
+
+if(median(d_full_set$int, na.rm = T) < 30){
+  d_full_set %>%
+    mutate(int = 2^int) -> d_full_set
+}
 
 d_full_set %>%
   filter(bio_ID %in% c("m3B", "m4A", "m5C")) %>%

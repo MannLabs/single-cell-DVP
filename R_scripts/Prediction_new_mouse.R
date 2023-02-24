@@ -78,8 +78,8 @@ cor(prediction_m1A_empirical$int_core, prediction_m1A_empirical$int_weighted)
 
 ggplot(prediction_m1A_empirical, aes(x = log2(int_weighted), y = int_core))+
   stat_density_2d(aes(fill = ..level..), geom = "polygon") +
-  scale_y_continuous(limits = c(11.1,14.8))+
-  scale_x_continuous(limits = c(11.1,14.8))+
+  #scale_y_continuous(limits = c(11.1,14.8))+
+  #scale_x_continuous(limits = c(11.1,14.8))+
   geom_abline(intercept = 0, slope = 1, color = "black", size = 1, lty = "dotted") +
   scale_fill_viridis()+
   theme_classic()+
