@@ -1,0 +1,1 @@
+cv <- function(x) 100*(sd(x, na.rm = T)/mean(x, na.rm = T))
