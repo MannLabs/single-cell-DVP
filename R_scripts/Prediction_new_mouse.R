@@ -74,7 +74,7 @@ prediction_m1A %>%
   distinct(Protein, cell_ID, .keep_all = T) %>%
   drop_na(int_weighted, int_core)  -> prediction_m1A_empirical
 
-cor(prediction_m1A_empirical$int_core, prediction_m1A_empirical$int_weighted)
+cor(prediction_m1A_empirical$int_core, prediction_m1A_empirical$int_weighted) -> cor
 
 ggplot(prediction_m1A_empirical, aes(x = log2(int_weighted), y = int_core))+
   stat_density_2d(aes(fill = ..level..), geom = "polygon") +
@@ -83,6 +83,7 @@ ggplot(prediction_m1A_empirical, aes(x = log2(int_weighted), y = int_core))+
   geom_abline(intercept = 0, slope = 1, color = "black", size = 1, lty = "dotted") +
   scale_fill_viridis()+
   theme_classic()+
+  labs(title = paste("Pearson's R:", cor)) +
   labs(x = "log2(Intensity predicted)", y = "log2(Intensity measured)") -> plot_m1A_predaccuracy
 
 ggsave(file = "../Output/Figures/m1A_predaccuracy.pdf", plot_m1A_predaccuracy, width = 5, height = 5)

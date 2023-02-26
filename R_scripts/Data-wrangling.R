@@ -10,6 +10,7 @@ rm(list=ls())
 
 ## Additional function
 source("./Functions/normalize_core.R")
+load("../output/Variables/refquant.R")
 
 ## Read common contaminants
 contaminants <- read_tsv("../Data/221109_common-contaminants_cRAP.tsv")
@@ -34,7 +35,7 @@ meta_distances <- read_csv("../data/meta_img-geometric-distance.csv") %>%
 ## Read proteomics data
 label_pattern = "\\(Dimethyl-n-[0-9]+\\)"
 
-read_tsv("../Data/89f5921594c92799946e67301cc9f12b_scDVP_refquant_corrected.formatted_for_iq.tsv.maxlfq_iq_protein_intensities.tsv") %>%
+read_tsv(refquant) %>%
   gather(R.FileName, int, !protein) %>%
   mutate(int = na_if(int, 0)) %>%
   drop_na(int) %>%

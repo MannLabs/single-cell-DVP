@@ -28,9 +28,25 @@ for (p in packages) {
 
 ## -- Set Working Directory
 setwd(dirname(getActiveDocumentContext()$path))
+
+# check if the folder exists
+lapply(c("../output/Figures", "../output/Variables/", "../output/Tables"), function(paths){
+  if (!dir.exists(paths)) {
+    # create the folder if it doesn't exist
+    dir.create(paths)
+    cat("Folder created: ", paths, "\n")
+  } else {
+    cat("Folder already exists: ", paths, "\n")
+  }
+})
+
 invisible(file.remove(list.files("../output/Figures", full.names = TRUE)))
 invisible(file.remove(list.files("../output/Variables", full.names = TRUE)))
 invisible(file.remove(list.files("../output/Tables", full.names = TRUE)))
+
+## -- Set RefQuant data file
+refquant <- "../Data/89f5921594c92799946e67301cc9f12b_scDVP_refquant_corrected.formatted_for_iq.tsv.maxlfq_iq_protein_intensities.tsv"
+save(refquant, file = "../output/Variables/refquant.R")
 
 ## -- Call files in order of appearance
 source("./Data-wrangling.R")
@@ -48,3 +64,4 @@ source("./Pseudo-FACS.R")
 source("./Prediction_class_proteomes.R")
 source("./Prediction_new_mouse.R")
 source("./Heatmap_global.R")
+source("./Clustered_tables.R")

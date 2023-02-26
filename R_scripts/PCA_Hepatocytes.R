@@ -109,10 +109,10 @@ plot_pca_Cyp2e1 <- PCAtools::biplot(p_heps ,
                      showLoadings = F) +
                    scale_color_viridis_c(limits = c(11, 15), oob = scales::squish)
 
-ggsave(file = "../Output/Figures/PCA-Ass1.pdf", plot_pca_Ass1, width = 7, height = 6)
-ggsave(file = "../Output/Figures/PCA-Cyp2e1.pdf", plot_pca_Cyp2e1, width = 7, height = 6)
+ggsave(file = "../output/Figures/PCA-Ass1.pdf", plot_pca_Ass1, width = 7, height = 6)
+ggsave(file = "../output/Figures/PCA-Cyp2e1.pdf", plot_pca_Cyp2e1, width = 7, height = 6)
 
 ## save variables to file
 save(p_heps, file = "../output/Variables/p_heps.R")
 save(d_complete_heps, file = "../output/Variables/d_complete_heps.R")
-save(d, file = "../output/variables/d.R")
+save(d, file = "../output/Variables/d.R")
