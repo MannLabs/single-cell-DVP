@@ -38,18 +38,23 @@ Figures and result dataframes are saved in the [output](/output/) folder.
 - [Prediction proteome calculation](R_scripts/Prediction_class_proteomes.R)
 
 ### Scripts for main figures
-#### Figure 2, Depth of single shape proteomes and estimation of nuclear compartment
+* Figure 2, Depth of single shape proteomes and estimation of nuclear compartment
 - [Figure 2, Intensity of top four histones](R_scripts/Histone-levels.R)
-#### Figure 3, Single shape proteomes are accurate descriptors of zonated hepatocytes
+* Figure 3, Single shape proteomes are accurate descriptors of zonated hepatocytes
 - [Figure 3a, PCA with distance metric overlay](R_scripts/PCA_vs_geometric-distance.R)
 - [Figure 3b, Distance metric versus PC1](R_scripts/PCA_vs_geometric-distance.R)
-#### Figure 4, Combining imaging and proteome data for a machine-learned model
+- [Figure 3c, Global heatmap of 90% complete proteome](R_scripts/Heatmap_global_distances.R)
+- [Figure 3d, Expression by location](R_scripts/Heatmap_markers.R)
+- [Figure 3e, Relative expression of top-10 differential proteins](Spatial_expression_top10.R)
+- [Figure 3f, Spatial Gene Set Enrichment Analysis]()
+- [Figure 3g, Urea cycle and peroxisomal fatty acid metabolism](Pathway_Urea_Peroxisome.R)
+* Figure 4, Combining imaging and proteome data for a machine-learned model
 - [Figure 4a, Pseudo-FACS plot](R_scripts/Pseudo-FACS.R)
 - [Figure 4b, Proteome bin versus staining intensity](R_scripts/Pseudo-FACS.R)
 - [Figure 4e, Proteome prediction of an unseen section](R_scripts/Prediction_new_mouse.R)
 
 ### Scripts for supplementary figures
-#### Supplementary Figure S3: Performance overview of single shape proteomes
+* Supplementary Figure S3: Performance overview of single shape proteomes
 - [Figure S3a, Labelling efficiency](R_scripts/Labelling-efficiency.R)
 - [Figure S3b, Protein IDs per biological replicate](R_scripts/Protein-IDs_vs_Runs.R)
 - [Figure S3c, Abundance range and transcription factors](RR_scripts/ank_versus_Intensity.R)
@@ -64,7 +69,7 @@ Figures and result dataframes are saved in the [output](/output/) folder.
 - [Figure S4d, PCA with loadings](R_scripts/PCA_Hepatocytes.R)
 - [Figure S4e, PCA including endothelial cells](R_scripts/PCA_Endothelial.R)
 
-#### Supplementart Figure S6
+* Supplementart Figure S6
 - [Script - Supplementary_Figure_6](R_scripts/Supplementary_Figure_6.R)
 
 - [Template](Template.R)
