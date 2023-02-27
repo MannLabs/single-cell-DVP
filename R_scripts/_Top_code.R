@@ -63,5 +63,12 @@ source("./Protein-IDs_vs_Runs.R")
 source("./Pseudo-FACS.R")
 source("./Prediction_class_proteomes.R")
 source("./Prediction_new_mouse.R")
-source("./Heatmap_global.R")
+source("./Heatmap_global_distances.R")
 source("./Clustered_tables.R")
+source("./Heatmap_markers.R")
+source("./Limma_statistics.R")
+source("./Spatial_expression_top10.R")
+source("./Pathway_Urea_Peroxisome.R")
+source("./Shapiro.R")
+
+
