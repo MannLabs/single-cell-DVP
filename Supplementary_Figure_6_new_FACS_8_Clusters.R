@@ -2,12 +2,7 @@
 
 # This script contains all analyses of Supplementary Figure 6:
 
-# Supplementary Figure 6a: Abundance normalized to 1 across 9 bins in Halpern et al. 6 (left, marker expression guided bins), and this scDVP data (PC1-guided bins).
-# Supplementary Figure 6b: Intensity correlation of all hits and zonation markers.
-# Supplementary Figure 6c: Intensity correlation highlighting outliers. 
-# Supplementary Figure 6d: Correlation coefficient for targets across all bins, with multiple testing adjusted p value
-# Supplementary Figure 6e: Gne set enrichment analysis on Pearson correlation coefficient.
-
+# Integration of DVP and FACS sorted proteomics data
 
 ##### Prepare Workspace ####################
 
@@ -51,6 +46,10 @@ if (setup == "yes") {
   
   library(svMisc)
   
+  library(ggridges)
+  
+  library(readxl)
+  
 }
 
 
@@ -66,58 +65,31 @@ setwd(dirname(getActiveDocumentContext()$path))
 
 ## Variables 
 
-current_dataset <- "Supplementary_Figure_6"
-
-
-
-
-##### Preparation of Data ##################
-
-#- around 50% of the expressed liver genes are non-randomly spatially zonated
-#- expression of genes over more than four orders of magnitude, including genes with low expression
-
-# DVP data were received from Florian Rosenberger (20220922), RNAseq were downloaded from https://www.nature.com/articles/nature21065#Sec13
-
-
-# Clusters in the RNA dataset that should be merged
-## here, no merging will be done (in contrast to the last approaches)
-## The merginng is a mock for consistency in the script here:
-
-RNA_merged_1 <- c("Layer 1")
-RNA_merged_2 <- c("Layer 2")
-RNA_merged_3 <- c("Layer 3")
-RNA_merged_4 <- c("Layer 4")
-RNA_merged_5 <- c("Layer 5")
-RNA_merged_6 <- c("Layer 6")
-RNA_merged_7 <- c("Layer 7")
-RNA_merged_8 <- c("Layer 8")
-RNA_merged_9 <- c("Layer 9")
-
-# summarize these clusters in a Vector 
-# with this, we can also add or remove a cluster in the point above
-Merging_vector <- c("RNA_merged_1","RNA_merged_2", "RNA_merged_3", "RNA_merged_4", "RNA_merged_5","RNA_merged_6", "RNA_merged_7", "RNA_merged_8", "RNA_merged_9")
-
+current_dataset <- "Supplementary_Figure_6_new_FACS_8_Clusters"
 
 
 
 # Load data 
 
-DVP <- data.table::fread(file = paste0("data/",current_dataset,"/221123_scDVP_Protoemics-to-RNAseq__PC1distance_cluster_9_new.csv"),
-                         sep = ",",
-                         #nrows = 5000,
-                         header = TRUE,
-                         stringsAsFactors = FALSE,
-                         fill = TRUE,
-                         integer64 = "numeric",
-                         na.strings = "Filtered",
-                         data.table = FALSE,
-                         check.names = FALSE, # due to version issues
-                         verbose = FALSE,
-                         nThread = 10,
-                         showProgress = TRUE)
+
+DVP  <- data.table::fread(file = paste0("output/tables/Proteome_to_FACS_8PCbins.tsv"),             
+                                    sep = "\t",
+                                    #nrows = 5000,
+                                    header = TRUE,
+                                    stringsAsFactors = FALSE,
+                                    fill = TRUE,
+                                    integer64 = "numeric",
+                                    na.strings = "Filtered",
+                                    data.table = FALSE,
+                                    check.names = FALSE, # due to version issues
+                                    verbose = FALSE,
+                                    nThread = 10,
+                                    showProgress = TRUE)
 
 
-RNAseq <- data.table::fread(file = paste0("data/",current_dataset,"/Halpern_S3_Average_Expression.csv"),
+
+
+FACS <- data.table::fread(file = paste0("data/Supplementary_Figure_6/Moshe_S3_FACS_Proteomics.csv"),
                             sep = ",",
                             #nrows = 5000,
                             header = TRUE,
@@ -134,26 +106,81 @@ RNAseq <- data.table::fread(file = paste0("data/",current_dataset,"/Halpern_S3_A
 
 
 
+##### 1. Reshape FACS dataframe ##################
 
-# Reshape DVP dataframe 
+# prepare FACS dataframe to look like RNAseq dataframe
+
+FACS <- FACS %>%
+ select(ends_with("LFQ")|c("Gene names", "Protein IDs"))
+
+# remove log 2
+
+all_samples <- as.character(colnames(FACS[, !colnames(FACS) %in% c("Gene names", "Protein IDs")] ))
+FACS[,all_samples] <- 2^(FACS[,all_samples]) 
+
+# make mean of replicates
+
+mean.df <- data.frame(Columns = all_samples) %>%
+  mutate(Cluster = str_split_fixed(.$Columns, "_", 3)[,2])
+
+FACS.mean <- FACS %>%
+  column_to_rownames("Protein IDs") %>%
+  select(-c("Gene names")) %>%
+  t() %>%
+  as.data.frame() %>%
+  mutate(Cluster = mean.df$Cluster[match(rownames(.), mean.df$Columns)]) %>%
+  rownames_to_column("Sample IDs") %>%
+  group_by(Cluster) %>%
+  summarise(across(-`Sample IDs`, mean, na.rm = TRUE)) %>%
+  ungroup() %>%
+  column_to_rownames("Cluster") %>%
+  t() %>%
+  as.data.frame()
+
+
+# match back gene names
+
+FACS.mean$`Gene names` <- FACS$`Gene names`[match(rownames(FACS.mean), FACS$`Protein IDs`)]
+
+FACS.mean <- FACS.mean %>%
+  rownames_to_column("Protein") 
+
+
+colnames(FACS.mean)[colnames(FACS.mean) == 'variable'] <- 'bin'
+colnames(FACS.mean)[colnames(FACS.mean) == 'value'] <- 'int'
+colnames(FACS.mean)[colnames(FACS.mean) == 'Gene names'] <- 'Symbol'
+
+
+FACS.mean$Symbol[FACS.mean$Symbol == ''] <- 'unknown_symbol'
+
+
+
+##### 2a. Reshape and normalize DVP dataframe ##################
 
 DVP <- DVP %>%
-  select(!c("Genename","ENSEMBL"))
+  select(!c("ENSEMBL"))
 
-DVP$cluster_anchorprotein <- gsub('1', 'cluster_anchor_1', DVP$cluster_anchorprotein)
-DVP$cluster_anchorprotein <- gsub('2', 'cluster_anchor_2', DVP$cluster_anchorprotein)
-DVP$cluster_anchorprotein <- gsub('3', 'cluster_anchor_3', DVP$cluster_anchorprotein)
-DVP$cluster_anchorprotein <- gsub('4', 'cluster_anchor_4', DVP$cluster_anchorprotein)
-DVP$cluster_anchorprotein <- gsub('5', 'cluster_anchor_5', DVP$cluster_anchorprotein)
-DVP$cluster_anchorprotein <- gsub('6', 'cluster_anchor_6', DVP$cluster_anchorprotein)
-DVP$cluster_anchorprotein <- gsub('7', 'cluster_anchor_7', DVP$cluster_anchorprotein)
-DVP$cluster_anchorprotein <- gsub('8', 'cluster_anchor_8', DVP$cluster_anchorprotein)
-DVP$cluster_anchorprotein <- gsub('9', 'cluster_anchor_9', DVP$cluster_anchorprotein)
+# remove logarithm
+
+#DVP$int <- 10*(DVP$int)
+
+
+# rename column
+
+DVP$bin <- gsub('1', 'cluster_anchor_1', DVP$bin)
+DVP$bin <- gsub('2', 'cluster_anchor_2', DVP$bin)
+DVP$bin <- gsub('3', 'cluster_anchor_3', DVP$bin)
+DVP$bin <- gsub('4', 'cluster_anchor_4', DVP$bin)
+DVP$bin <- gsub('5', 'cluster_anchor_5', DVP$bin)
+DVP$bin <- gsub('6', 'cluster_anchor_6', DVP$bin)
+DVP$bin <- gsub('7', 'cluster_anchor_7', DVP$bin)
+DVP$bin <- gsub('8', 'cluster_anchor_8', DVP$bin)
+#DVP$bin <- gsub('9', 'cluster_anchor_9', DVP$bin)
 
 # long to wide dataframe
 
 DVP <- DVP %>% 
-  spread(cluster_anchorprotein, int_mean, fill = NA, convert = FALSE)
+  spread(bin, int, fill = NA, convert = FALSE)
 
 
 # Check for row duplicates in gene names
@@ -188,8 +215,6 @@ if (length(test_vector) > 0) {
   
 }
 
-
-
 DVP <- DVP %>%
   select(!c("Protein")) %>%
   column_to_rownames("Symbol")
@@ -202,7 +227,7 @@ DVP_normalized <- DVP
 
 # reverse log2
 
-#DVP_normalized <- 2^(DVP_normalized) 
+DVP_normalized <- 2^(DVP_normalized) 
 
 
 #DVP_normalized$Summed.intensities <- rowSums(DVP)
@@ -217,89 +242,58 @@ DVP_normalized <- DVP_normalized %>%
 
 
 
+##### 2b. Reshape and normalize FACS dataframe ##################
+
+# the DVP step from above is repeated
+
+test_vector <- FACS.mean$Symbol[duplicated(FACS.mean$Symbol)] 
 
 
-
-# Reshape RNASeq dataframe 
-
-# Exchange 0 with NaN
-
-RNAseq[RNAseq == 0] <- NA  
-
-
-# Filter for empty rows in dataframe
-
-RNAseq <- RNAseq %>%
-  column_to_rownames("Gene Symbol")
-
-RNAseq$NA.count <- rowSums(is.na(RNAseq))
-
-RNAseq <- RNAseq %>%
-  filter(NA.count != 9)
-
-
-# Merge Cluster Columns 
-# NA values are ignored in the mean
-
-
-# Dataframe for collecting results from loop
-RNAseq_mean <-  RNAseq[,!names(RNAseq) %in% c(colnames(RNAseq))]
-
-
-for (i in Merging_vector) {
+if (length(test_vector) > 0) {
   
-  print(paste0("Starting with Cluster ", i))
+  print("Adjustment to fix gene name duplicates is done.")
   
-  # Make mean of columns defined in loop
-  intData <- RNAseq %>%
-    select(all_of(get(i))) %>%
-    mutate(Mean = rowMeans(., na.rm = T)) %>%
-    select(Mean) 
   
-  # Rename column and merge with target dataframe
-  
-  names(intData)[names(intData) == "Mean"] <- paste0(i)
-  
-  RNAseq_mean <- merge(RNAseq_mean, intData, by=0, all=TRUE) 
-  
-  RNAseq_mean <- RNAseq_mean %>%
-    as.data.frame() %>%
-    column_to_rownames("Row.names")
+  for (z in test_vector) {
+    
+    # merge protein ID and gene name
+    intData <- FACS.mean %>%
+      filter(Symbol == z) %>%
+      mutate(Symbol = paste0(.$Symbol, "_",.$Protein ))
+    
+    # replace in dataframe
+    
+    FACS.mean <- FACS.mean %>%
+      filter(Symbol != z)
+    
+    FACS.mean <- rbind(FACS.mean, intData)
+    
+    print(paste0("Gene symbol changed for ", z))
+    
+  }
   
 }
 
-
-# reverse cluster order for RNAseq
-# RNAseq_mean
-
-RNAseq_mean <- RNAseq_mean %>%
-  rename(
-    RNA_merged_9 = RNA_merged_1,
-    RNA_merged_8 = RNA_merged_2,
-    RNA_merged_7 = RNA_merged_3,
-    RNA_merged_6 = RNA_merged_4,
-    RNA_merged_5 = RNA_merged_5,
-    RNA_merged_4 = RNA_merged_6,
-    RNA_merged_3 = RNA_merged_7,
-    RNA_merged_2 = RNA_merged_8,
-    RNA_merged_1 = RNA_merged_9) %>%
-  select(order(colnames(.)))
+FACS.mean <- FACS.mean %>%
+  select(!c("Protein")) %>%
+  column_to_rownames("Symbol")
 
 
 # Normalize intensities
-# Intensities are summed per transcript, then the ratio of each intensity is calculated
+# Intensities are summed per protein, then the ratio of each intensity is calculated
 
-RNAseq_normalized <- RNAseq_mean
+FACS_normalized <- FACS.mean
 
-# rows with NA values are excluded
-RNAseq_normalized$Summed.intensities <- rowSums(RNAseq_normalized)
+FACS_normalized$Summed.intensities = apply(FACS_normalized, 1, sum)
 
-RNAseq_normalized <- RNAseq_normalized/RNAseq_normalized[,"Summed.intensities"]
+FACS_normalized <- FACS_normalized/FACS_normalized[,"Summed.intensities"]
 
-RNAseq_normalized <- RNAseq_normalized %>%
-  select(-c(Summed.intensities)) %>%
-  rownames_to_column("Symbol")
+FACS_normalized <- FACS_normalized %>%
+  select(-c(Summed.intensities))
 
+
+
+#### 3. Fix plurality of gene names ############################
 
 # Fix plurality of gene names
 # Some Genes have several names:
@@ -321,14 +315,31 @@ DVP_normalized <- DVP_normalized %>%
 warning('Proteins with Symbol names "unknown_symbol" were removed.')
 
 
-# fix RNA names with several genes
 
-for (p in 1:nrow(RNAseq_normalized)) {
+
+# generate vector with IDs that appear in FACS dataset
+FACS.vect <- rownames(FACS_normalized) 
+
+# remove unknown gene symbols in FACS data
+FACS.vect <- FACS.vect[!FACS.vect %in% grep(paste0("unknown_symbol"), FACS.vect, value = T)]
+# and remove these genes from FACS dataframe
+FACS_normalized <- FACS_normalized %>%
+  rownames_to_column("Symbol") %>%
+  filter(., !grepl('unknown_symbol', Symbol)) 
+
+warning('Proteins with Symbol names "unknown_symbol" were removed.')
+
+
+
+
+# fix FACS gene names with several genes
+
+for (p in 1:nrow(FACS_normalized)) {
   
   #print(p)
   #break}
   
-  Symbol.oi <- RNAseq_normalized[p, "Symbol"]
+  Symbol.oi <- FACS_normalized[p, "Symbol"]
   
   if (grepl(";", Symbol.oi, fixed=TRUE)) {
     
@@ -344,7 +355,7 @@ for (p in 1:nrow(RNAseq_normalized)) {
       print(paste0("Correction of gene names done for ", overlap))
       
       # replace gene name in dataframe
-      RNAseq_normalized[p,"Symbol"] <- paste0(overlap)
+      FACS_normalized[p,"Symbol"] <- paste0(overlap)
     }
     
     if (length(overlap) > 1) {
@@ -355,17 +366,21 @@ for (p in 1:nrow(RNAseq_normalized)) {
   }
 } #end of for loop
 
-RNAseq_normalized <- RNAseq_normalized %>%
+
+FACS_normalized <- FACS_normalized %>%
   column_to_rownames("Symbol")
 
 
 
+# adjust column names
+
+DVP.colnames <- data.frame(s.names = colnames(DVP_normalized)) %>%
+  mutate(new_clusters = 1:nrow(.))
+
+names(DVP_normalized) <- DVP.colnames$new_clusters[match(names(DVP_normalized), DVP.colnames$s.names)]
 
 # Clear workspace
-rm(list=setdiff(ls(), c("DVP_normalized", "RNAseq_normalized", "current_dataset")))
-
-
-
+rm(list=setdiff(ls(), c("DVP_normalized", "FACS_normalized", "current_dataset")))
 
 
 
@@ -380,19 +395,19 @@ target.vec <- c("Glul", "Cyp2e1", "Ass1", "Asl", "Alb", "Cyp2f2")
 # Plot data for RNAseq merged df 
 
 # filter dataframe
-RNAseq_normalized_filtered <- RNAseq_normalized %>%
+FACS_normalized_filtered <- FACS_normalized %>%
   filter(rownames(.) %in% target.vec) %>%
   rownames_to_column("Symbol")
 
 # wide to long
 
-RNAseq_normalized_filtered  <- RNAseq_normalized_filtered %>%
+FACS_normalized_filtered  <- FACS_normalized_filtered %>%
   gather(Merged_cluster, Expression, -c("Symbol"))
 
 
 # plot 
 
-RNA.plt <- ggplot(RNAseq_normalized_filtered, aes(x=Merged_cluster, y=Expression, group=Symbol)) +
+FACS.plt <- ggplot(FACS_normalized_filtered, aes(x=Merged_cluster, y=Expression, group=Symbol)) +
   geom_line(aes(color=Symbol),size = 1)+
   geom_point(aes(color=Symbol), size = 2.5) +
   xlab(paste0("Cluster")) + 
@@ -400,18 +415,19 @@ RNA.plt <- ggplot(RNAseq_normalized_filtered, aes(x=Merged_cluster, y=Expression
   scale_colour_viridis_d() +
   theme_bw() +
   theme(plot.margin = unit(c(1,1,1,1),"cm"),
-        panel.grid = element_line(colour = "transparent"),
-        axis.text.x = element_text(angle=45,hjust=1)) +
-  labs(title = paste0("scRNAseq"))
+        panel.grid = element_line(colour = "transparent")) +
+  labs(title = paste0("FACS Proteome")) 
 
 
-RNA.plt
+FACS.plt
 
-ggsave(file = paste0("output/",current_dataset,"/RNA_Line_plot_marker_proteins_normalized_dataset.png"),
+
+
+ggsave(file = paste0("output/",current_dataset,"/FACS_Line_plot_marker_proteins_normalized_dataset.png"),
        width = 7,
        height = 6)
 
-ggsave(file = paste0("output/",current_dataset,"/RNA_Line_plot_marker_proteins_normalized_dataset.pdf"),
+ggsave(file = paste0("output/",current_dataset,"/FACS_Line_plot_marker_proteins_normalized_dataset.pdf"),
        width = 7,
        height = 6)
 
@@ -430,6 +446,7 @@ DVP_normalized_filtered  <- DVP_normalized_filtered %>%
   gather(Merged_cluster, Expression, -c("Symbol"))
 
 
+
 # plot 
 
 DVP.plt <- ggplot(DVP_normalized_filtered, aes(x=Merged_cluster, y=Expression, group=Symbol)) +
@@ -440,8 +457,7 @@ DVP.plt <- ggplot(DVP_normalized_filtered, aes(x=Merged_cluster, y=Expression, g
   scale_colour_viridis_d() +
   theme_bw() +
   theme(plot.margin = unit(c(1,1,1,1),"cm"),
-        panel.grid = element_line(colour = "transparent"),
-        axis.text.x = element_text(angle=45,hjust=1)) +
+        panel.grid = element_line(colour = "transparent")) +
   labs(title = paste0("scDVP"))
 
 
@@ -456,12 +472,76 @@ ggsave(file = paste0("output/",current_dataset,"/DVP_Line_plot_marker_proteins_n
        height = 6)
 
 
+
+# try combined plot
+
+# for this, first match and combine dataframes
+
+FACS_normalized_filtered$Technique <- paste0("FACS")
+DVP_normalized_filtered$Technique <- paste0("DVP")
+
+line.comb <- rbind(FACS_normalized_filtered, DVP_normalized_filtered)
+
+
+library(plotly)
+
+
+fig <- plot_ly(line.comb, x = ~Merged_cluster, y = ~Expression, z = ~Symbol, split = ~Technique, color = ~Symbol, type = 'scatter3d', mode = 'lines',
+               line = list(width = 4, dash = c("solid", "dash")))
+
+fig
+
+
+
+FACS_normalized_filtered$Merged_cluster <- as.numeric(str_split_fixed(FACS_normalized_filtered$Merged_cluster, "_", 3)[,3])
+
+DVP_normalized_filtered$Merged_cluster <- as.numeric(str_split_fixed(DVP_normalized_filtered$Merged_cluster, "_", 3)[,3])
+
+
+scene = list(camera = list(eye = list(x = -1.25, y = -1.25, z = 1.25)))
+
+fig <- plot_ly(type = 'scatter3d', mode = 'lines',
+               line = list(width = 4)) %>%
+  add_trace(data = DVP_normalized_filtered, x = ~Merged_cluster, y = ~Symbol, z = ~Expression, name = 'DVP', type = 'scatter3d', mode = 'lines', split = ~Symbol, color = ~Symbol,
+            line = list(shape = 'linear', width= 4, dash = "dash")) %>%
+  add_trace(data = FACS_normalized_filtered, x = ~Merged_cluster, y = ~Symbol, z = ~Expression, name = 'RNAseq', type = 'scatter3d', mode = 'lines', split = ~Symbol,color = ~Symbol,
+            line = list(shape = 'linear', width= 4)) %>%
+  layout(title = "DVP - RNAseq", scene = scene)
+
+
+fig
+
+
+# try paired plots with grid
+
+
+comb.plt <- ggplot(line.comb, aes(x=Merged_cluster, y=Expression, group=Technique)) +
+  geom_line(aes(color=Technique),size = 0.5)+
+  geom_point(aes(color=Technique), size = 1.5) +
+  xlab(paste0("Cluster")) + 
+  ylab(paste0("Normalized abundance")) +
+  scale_colour_viridis_d(begin = 0.8, end = 0) +
+  theme_bw() +
+  theme(plot.margin = unit(c(1,1,1,1),"cm"),
+        panel.grid = element_line(colour = "transparent")) +
+  facet_wrap(~Symbol, ncol = 3) +
+  ggtitle(paste0("Marker panels of liver zonation - DVP vs. FACS Proteome"))
+
+
+comb.plt
+
+ggsave(file = paste0("output/",current_dataset,"/Line_plot_marker_proteins_normalized_combined.png"),
+       width = 7,
+       height = 5)
+
+ggsave(file = paste0("output/",current_dataset,"/Line_plot_marker_proteins_normalized_combined.pdf"),
+       width = 7,
+       height = 5)
+
+
 # Clear workspace
 
-rm(list=setdiff(ls(), c("DVP_normalized", "RNAseq_normalized", "current_dataset")))
-
-
-
+rm(list=setdiff(ls(), c("DVP_normalized", "FACS_normalized", "current_dataset")))
 
 
 
@@ -476,13 +556,13 @@ DVP.long <- DVP_normalized %>%
   rownames_to_column("Symbol") %>%
   gather(Cluster, Intensity_DVP, -c(Symbol)) 
 
-RNA.long <- RNAseq_normalized %>%
+FACS.long <- FACS_normalized %>%
   rownames_to_column("Symbol") %>%
-  gather(Cluster, Intensity_RNA, -c(Symbol)) 
+  gather(Cluster, Intensity_FACS, -c(Symbol)) 
 
 # Create common cluster names
 
-datasets <- c("DVP.long", "RNA.long")
+datasets <- c("DVP.long", "FACS.long")
 
 for (k in datasets) {
   
@@ -533,10 +613,6 @@ for (k in datasets) {
       k.int[,"Cluster"] <- gsub(q, 'C8', k.int[,"Cluster"])
     }
     
-    # For Cluster 9
-    if (grepl(9, q, fixed=TRUE)) {
-      k.int[,"Cluster"] <- gsub(q, 'C9', k.int[,"Cluster"])
-    }
     
   }
   
@@ -556,8 +632,8 @@ for (k in datasets) {
   }
   
   
-  if (k == "RNA.long") {
-    RNA.common <- k.int
+  if (k == "FACS.long") {
+    FACS.common <- k.int
   }
   
   
@@ -565,12 +641,9 @@ for (k in datasets) {
 
 
 
-
-
-
 # Generate Correlation Scatter Plots 
 
-intData <- merge(RNA.common, DVP.common, by = 0) %>%
+intData <- merge(FACS.common, DVP.common, by = 0) %>%
   mutate(Symbol = paste0(str_split_fixed(.[,"Row.names"], "_", 2)[, 1]),
          Cluster = paste0(str_split_fixed(.[,"Row.names"], "_", 2)[, 2])) %>%
   column_to_rownames("Row.names")
@@ -605,7 +678,9 @@ correlation.plt <- ggplot() +
   annotate("text",x=0.5,y=0.25,label=(paste0("slope== ",coef(lm(intData[,2]~intData[,1]))[2])),parse=TRUE, color = "red")+
   annotate("text",x=0.5,y=0.4,label=(paste0("slope== ",coef(lm(intData.targeted[,2]~intData.targeted[,1]))[2])),parse=TRUE, color = "black") +
   annotate("text",x=0.5,y=0.5,label=(paste0("slope== 1")),parse=TRUE, color = "grey") +
-  geom_abline(slope= 1, intercept=0 ,colour= "grey", linetype = "dashed", size = 1)
+  geom_abline(slope= 1, intercept=0 ,colour= "grey", linetype = "dashed", size = 1) +
+  scale_x_continuous(limits = c(0,0.9)) +
+  scale_y_continuous(limits = c(0,0.9)) 
 
 
 correlation.plt
@@ -623,15 +698,15 @@ ggsave(file = paste0("output/",current_dataset,"/Correlation_Cluster_all_after_m
 # same plot but with outliers highlighted
 
 outliers.DVP <- intData %>%
-  filter(Intensity_DVP >= 0.35)
+  filter(Intensity_DVP >= 0.5)
 
-outliers.RNA <- intData %>%
-  filter(Intensity_RNA >= 0.4)
+outliers.FACS <- intData %>%
+  filter(Intensity_FACS >= 0.4)
 
 correlation.plt.highlight <- ggplot() + 
   geom_point(data = intData, aes(x=intData[,1], y=intData[,2], color = Cluster),  alpha = 0.2) +
   geom_point(data = outliers.DVP, x=outliers.DVP[,1], y=outliers.DVP[,2], color = "red", size = 2) +
-  geom_point(data = outliers.RNA, x=outliers.RNA[,1], y=outliers.RNA[,2], color = "blue", size = 2) +
+  geom_point(data = outliers.FACS, x=outliers.FACS[,1], y=outliers.FACS[,2], color = "blue", size = 2) +
   xlab(paste0(colnames(intData[1]))) + 
   ylab(paste0(colnames(intData[2]))) +
   scale_colour_viridis_d() +
@@ -647,13 +722,16 @@ correlation.plt.highlight <- ggplot() +
                   max.overlaps = Inf,
                   segment.size = 0.5)+
   
-  geom_text_repel(data = outliers.RNA,
-                  aes(x=outliers.RNA[,1], y=outliers.RNA[,2],
-                      label = rownames(outliers.RNA)),
+  geom_text_repel(data = outliers.FACS,
+                  aes(x=outliers.FACS[,1], y=outliers.FACS[,2],
+                      label = rownames(outliers.FACS)),
                   size = 1.5,
                   color = "black",
                   max.overlaps = Inf,
-                  segment.size =0.5)
+                  segment.size =0.5)+
+  scale_x_continuous(limits = c(0,0.9)) +
+  scale_y_continuous(limits = c(0,0.9)) 
+
 
 correlation.plt.highlight
 
@@ -693,7 +771,7 @@ for (k in entry_list) {
   
   try({
     
-    res <- cor.test(intData2[,"Intensity_RNA"], intData2[,"Intensity_DVP"], 
+    res <- cor.test(intData2[,"Intensity_FACS"], intData2[,"Intensity_DVP"], 
                     method = "pearson")
     
     # Extract the p.value
@@ -742,6 +820,7 @@ posCor.df <- significants %>%
 negCor.df <- significants %>%
   arrange(., desc(as.numeric(corr.coef))) %>%
   mutate(rank = 1:nrow(.)) %>%
+  filter(corr.coef < 0 ) %>%
   filter(rank > (length(.$rank)-10))
 
 # plot 
@@ -780,8 +859,10 @@ uplot <- ggplot() +
                   segment.alpha = 0.5,
                   segment.size = 1)+
   labs(title = paste0("Pearson Correlation Testing"),
-       subtitle = paste0("RNAseq vs. DVP \nNumber of significant hits: ", length(significants$Gene)))
+       subtitle = paste0("FACS vs. DVP \nNumber of significant hits: ", length(significants$Gene)))
 
+
+uplot
 
 ggsave(file = paste0("output/",current_dataset,"/Pearson_Correlation_Testing_Uplot.png"),
        width = 6,
@@ -801,7 +882,7 @@ write.csv(uplot.df, file = paste0("output/",current_dataset,"/UPlot_Enrichment_"
 
 
 
-rm(list=setdiff(ls(), c("DVP_normalized", "RNAseq_normalized", "current_dataset", "uplot.df")))
+rm(list=setdiff(ls(), c("DVP_normalized", "FACS_normalized", "current_dataset", "uplot.df")))
 
 
 

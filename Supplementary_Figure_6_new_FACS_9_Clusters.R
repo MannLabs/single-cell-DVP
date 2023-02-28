@@ -65,7 +65,7 @@ setwd(dirname(getActiveDocumentContext()$path))
 
 ## Variables 
 
-current_dataset <- "Supplementary_Figure_6_new_FACS"
+current_dataset <- "Supplementary_Figure_6_new_FACS_9_Clusters"
 
 
 
@@ -85,6 +85,9 @@ DVP  <- data.table::fread(file = paste0("output/tables/Proteome_to_FACS_9PCbins.
                                     verbose = FALSE,
                                     nThread = 10,
                                     showProgress = TRUE)
+
+
+
 
 FACS <- data.table::fread(file = paste0("data/Supplementary_Figure_6/Moshe_S3_FACS_Proteomics.csv"),
                             sep = ",",
