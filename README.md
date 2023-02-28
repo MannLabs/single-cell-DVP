@@ -64,20 +64,23 @@ Figures and result dataframes are saved in the [output](/output/) folder.
 - [Figure S3e, Data completeness versus intensity](R_scripts/Completeness_vs_Intensity.R)
 - [Figure S3f, Normalization versus CVs](R_scripts/CVs.R)
 
-#### Supplementary Figure S4: Dimensionality reduction of single shape data
+#### Supplementary Figure S4: Concatentation of shapes
+- [Figure S4](R_scripts/PCA_reductive.R)
+
+#### Supplementary Figure S5: Dimensionality reduction of single shape data
 - [Figure S4a, PCA with Ass1 expression levels](R_scripts/PCA_Hepatocytes.R)
 - [Figure S4b, PCA with Cyp2e1 expression levels](R_scripts/PCA_Hepatocytes.R)
 - [Figure S4c, Distance metric versus PC12](R_scripts/PCA_vs_geometric-distance.R)
 - [Figure S4d, PCA with loadings](R_scripts/PCA_Hepatocytes.R)
 - [Figure S4e, PCA including endothelial cells](R_scripts/PCA_Endothelial.R)
 
-#### Supplementary Figure S5: Normality checks of single shape data
+#### Supplementary Figure S6: Normality checks of single shape data
 - [Figure S5a, Volcano plot]()
 - [Figure S5b, Shapiro-Wilk-Test](R_scripts/Shapiro.R)
 - [Figure S5c, Pearson correlation between zones](R_scripts/)
 - [Figure S5d, Relative expression of bottom-10 differential proteins](R_scripts/Shapiro.R)
 
-#### Supplementart Figure S6
+#### Supplementart Figure S7
 - [Script - Supplementary_Figure_6](R_scripts/Supplementary_Figure_6.R)
 
 - [Template](Template.R)
