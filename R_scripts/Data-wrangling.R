@@ -32,6 +32,14 @@ meta_distances <- read_csv("../data/meta_img-geometric-distance.csv") %>%
   drop_na(ratio) %>%
   mutate(cell_ID = str_replace(cell_ID, "DimethNter", "target"))
 
+##### Eliminate NAs
+meta_distances_tmp <- read_csv("../data/meta_img-geometric-distance.csv") %>%
+  mutate(sum_distance = `dist_to_portal_vein(pixels)` + `dist_to_central_vein(pixels)`) %>%
+  mutate(ratio = `dist_to_portal_vein(pixels)` / sum_distance) %>%
+  filter(is.na(ratio))
+
+write_tsv(meta_distances_tmp, file = "../output/Tables/meta_img-geometric-distances-missing.tsv")
+
 ## Read proteomics data
 label_pattern = "\\(Dimethyl-n-[0-9]+\\)"
 

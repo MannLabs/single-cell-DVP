@@ -12,6 +12,7 @@ rm(list=ls())
 load("../output/variables/d.R")
 load("../output/Variables/meta_distances.R")
 load("../output/Variables/meta_pg.R")
+source("../R_scripts/Functions/scale_dplyr.R")
 
 ## Define number of classes
 classes = 8
@@ -95,9 +96,3 @@ ggsave(plot_pheatmap, file = "../Output/Figures/Heatmap_liver-zonation.pdf", wid
 ## Save variables
 save(limma_8bins_90complete, file = "../output/Variables/limma_8bins_90complete.R")
 save(proteome_90_heps, file = "../output/Variables/proteome_90_heps.R")
-
-# + 
-#   theme(
-#     strip.background = element_blank(),
-#     strip.text.x = element_blank()
-#   ) + theme(panel.spacing.y = unit(-5, "points"))
