@@ -70,5 +70,3 @@ source("./Limma_statistics.R")
 source("./Spatial_expression_top10.R")
 source("./Pathway_Urea_Peroxisome.R")
 source("./Shapiro.R")
-
-
