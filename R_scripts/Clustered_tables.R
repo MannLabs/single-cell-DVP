@@ -142,3 +142,34 @@ d %>%
   drop_na(bin) -> table_proteome_to_FACS
 
 write_tsv(as.data.frame(table_proteome_to_FACS), "../output/Tables/Proteome_to_FACS_8PCbins.tsv")
+
+## -- Machine learning and proteome prediction, 5 PCA clusters
+## -- Prepare Workspace
+cat("\014")
+rm(list=ls())
+
+## Read relevant data
+load("../output/variables/d.R")
+load("../output/Variables/p_bins.R")
+load("../output/Variables/SA_incl_all.R")
+load("../output/Variables/meta_pg.R")
+load("../output/Variables/meta_distances.R")
+
+## Define number of classes
+classes = 5
+
+data.frame(cell_ID = rownames(p_bins), pc1 = p_bins$pc1) %>%
+  mutate(range = cut_interval(pc1, n = classes))  -> p_bins_tmp
+
+p_bins_tmp %>%
+  distinct(range) %>%
+  arrange(range) %>%
+  mutate(cluster = c(1:classes)) %>%
+  right_join(p_bins_tmp) %>%
+  right_join(meta_distances) %>%
+  mutate(cluster = abs(cluster - (classes + 1))) %>%
+  dplyr::select(bio_ID, Index, cell_ID, cluster) %>%
+  dplyr::rename(Slide = bio_ID) %>%
+  drop_na(cluster) -> p_bins
+
+write_csv(as.data.frame(p_bins), "../output/Tables/Proteome_to_ML_5PCbins.csv")

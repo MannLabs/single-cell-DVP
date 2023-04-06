@@ -19,7 +19,10 @@ proteome_FA <- c("Acly", "Abcd3", "Acaa1a", "Acaa1b", "Ehhadh", "Hsd17b4", "Hmgc
 
 d %>%
   dplyr::select(cell_ID, Symbol, int_core) %>%
-  filter(Symbol %in% proteome_FA) -> d_FA
+  filter(Symbol %in% proteome_FA) %>%
+  spread(cell_ID, int_core) %>%
+  gather(cell_ID, int_core, !Symbol) %>%
+  replace_na(list(int_core = 0)) -> d_FA
 
 meta_distances_bins %>%
   rownames_to_column("cell_ID") %>%
@@ -62,6 +65,20 @@ d %>%
   dplyr::select(cell_ID, Symbol, int_core) %>%
   filter(Symbol %in% proteome_UC) -> d_UC
 
+d %>%
+  dplyr::select(cell_ID, Symbol, int_core) %>%
+  filter(Symbol %in% proteome_UC) %>%
+  spread(cell_ID, int_core) %>%
+  gather(cell_ID, int_core, !Symbol) %>%
+  left_join(meta_distances_bins %>%
+              rownames_to_column("cell_ID")) %>%
+  drop_na(bin) %>%
+  group_by(Symbol, bin) %>%
+  summarise(proportion_NAs = mean(is.na(int_core))) %>%
+  filter(proportion_NAs < 0.5) %>%
+  mutate(include_bin = paste(Symbol, bin, sep = "_")) %>%
+  pull(include_bin) -> UC_NAs
+
 meta_distances_bins %>%
   rownames_to_column("cell_ID") %>%
   left_join(d_UC) %>%
@@ -70,11 +87,16 @@ meta_distances_bins %>%
   summarise(median = median(int)) -> d_UC_tmp
 
 d_UC_tmp %>%
-  filter(bin == 4 | bin == 5) %>%
+  mutate(bin_ID = paste(Symbol, bin, sep = "_")) %>%
+  filter(bin_ID %in% UC_NAs) %>%
+  dplyr::select(- bin_ID) %>%
   group_by(Symbol) %>%
-  summarise(int_ref = median(median)) %>%
+  summarise(int_ref = median(median, na.rm = T)) %>%
   #dplyr::select(-bin) %>%
   right_join(d_UC_tmp) %>%
+  mutate(bin_ID = paste(Symbol, bin, sep = "_")) %>%
+  filter(bin_ID %in% UC_NAs) %>%
+  dplyr::select(- bin_ID) %>%
   mutate(int_relative = log2(median / int_ref)) %>%
   dplyr::select(bin, Symbol, int_relative) %>%
   spread(Symbol, int_relative) %>%
@@ -85,3 +107,8 @@ myColor <- colorRampPalette(viridis(100, option = "inferno"))(length(myBreaks))
 
 pheatmap(t(scale(d_UC)), cluster_cols = F, cluster_rows = F, color = myColor, breaks = myBreaks, cellwidth = 10, cellheight = 10) -> plot_urea
 ggsave(plot_urea, file = "../output/Figures/Ureacycle_hits.pdf")
+
+
+
+
+                        

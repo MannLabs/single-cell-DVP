@@ -52,4 +52,4 @@ PCAtools::biplot(p_cluster ,
 ## Save Figure, table and R object
 ggsave(file = "../output/Figures/PCA_kmeans.pdf", width = 7, height = 6, plot_pca_kmeans)
 save(meta_heps_cluster, file = '../output/Variables/meta_heps_cluster.R')
-write_tsv(meta_heps_cluster, file = "../output/Tables/kmeans_5clusters.csv")
+write_csv(meta_heps_cluster, file = "../output/Tables/kmeans_5clusters.csv")

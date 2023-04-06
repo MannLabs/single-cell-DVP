@@ -31,7 +31,7 @@ d %>%
   ungroup() %>%
   dplyr::select(-int_core) %>%
   spread(Symbol, int_scale) %>%
-  gather(Symbol, int_scale, 3:8) -> d_heat
+  gather(Symbol, int_scale, 3:ncol(.)) -> d_heat
 
 ggplot(d_heat) +
   geom_segment(aes(x = as.numeric(ratio), xend = as.numeric(ratio), y = 0, yend = 1, col = as.numeric(int_scale)), size = 1) +

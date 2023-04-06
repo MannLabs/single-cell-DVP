@@ -32,22 +32,14 @@ meta_distances <- read_csv("../data/meta_img-geometric-distance.csv") %>%
   drop_na(ratio) %>%
   mutate(cell_ID = str_replace(cell_ID, "DimethNter", "target"))
 
-##### Eliminate NAs
-meta_distances_tmp <- read_csv("../data/meta_img-geometric-distance.csv") %>%
-  mutate(sum_distance = `dist_to_portal_vein(pixels)` + `dist_to_central_vein(pixels)`) %>%
-  mutate(ratio = `dist_to_portal_vein(pixels)` / sum_distance) %>%
-  filter(is.na(ratio))
-
-write_tsv(meta_distances_tmp, file = "../output/Tables/meta_img-geometric-distances-missing.tsv")
-
 ## Read proteomics data
 label_pattern = "\\(Dimethyl-n-[0-9]+\\)"
 
 read_tsv(refquant) %>%
   gather(R.FileName, int, !protein) %>%
-  mutate(int = na_if(int, 0)) %>%
-  drop_na(int) %>%
-  mutate(int = as.numeric(int)) %>%
+  # replace(is.na(.), 0) %>%
+  # drop_na(int) %>%
+  mutate(int = 2^as.numeric(int)) %>%
   mutate(run_ID = paste(str_replace_all(str_replace_all(R.FileName, ".*scDVP_", ""), "_.*", ""),
                         str_replace_all(str_replace_all(R.FileName, ".*AID8_", ""), "_.*", ""),
                         sep = "_")) %>%
@@ -58,10 +50,10 @@ read_tsv(refquant) %>%
   mutate(tube_ID = str_replace(run_ID, ".*_", "")) %>%
   dplyr::rename(Protein = protein) -> d_full_set
 
-if(median(d_full_set$int, na.rm = T) < 30){
-  d_full_set %>%
-    mutate(int = 2^int) -> d_full_set
-}
+# if(median(d_full_set$int, na.rm = T) < 30){
+#   d_full_set %>%
+#     mutate(int = 2^int) -> d_full_set
+# }
 
 d_full_set %>%
   filter(bio_ID %in% c("m3B", "m4A", "m5C")) %>%

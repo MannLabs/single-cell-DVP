@@ -30,8 +30,7 @@ meta_distances_bin %>%
   mutate(bin = abs(bin - (classes + 1))) -> meta_distances_bin
 
 limma_8bins_allproteins %>%
-  arrange(adj.P.Val) %>%
-  top_n(rev(adj.P.Val), n = 10) %>%
+  slice_min(adj.P.Val, n = 10) %>%
   drop_na(Symbol) %>%
   pull(Symbol) -> proteome_top_10
 
