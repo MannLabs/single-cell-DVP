@@ -1,0 +1,97 @@
+###########################
+#### scDVP Figure Code ####
+###########################
+
+## -- Halpern et al, RNASeq data, 9 spatial clusters
+
+cat("\014")
+rm(list=ls())
+
+load("../output/variables/d.R")
+load("../output/Variables/SA_incl_all.R")
+load("../output/Variables/meta_pg.R")
+load("../output/Variables/meta_distances_bins.R")
+
+classes = 9
+
+data.frame(cell_ID = rownames(meta_distances_bins), ratio = meta_distances_bins$ratio) %>%
+  mutate(range = cut_interval(ratio, n = classes))  -> distance_bins_tmp
+
+distance_bins_tmp %>%
+  filter(cell_ID %in% SA_incl_all) %>%
+  distinct(range) %>%
+  arrange(range) %>%
+  mutate(bin = c(1:classes)) %>%
+  right_join(distance_bins_tmp) %>%
+  filter(cell_ID %in% SA_incl_all) %>%
+  column_to_rownames("cell_ID") %>%
+  mutate(bin = abs(bin - (classes + 1))) -> distance_bins
+
+d %>%
+  dplyr::select(cell_ID, int_core, Protein) %>%
+  spread(cell_ID, int_core) %>%
+  gather(cell_ID, int_core, !Protein) %>%
+  mutate(int_core = ifelse(is.na(int_core), 0, int_core)) %>%
+  left_join(distance_bins %>% rownames_to_column("cell_ID") %>% drop_na(bin)) %>%
+  left_join(meta_pg) %>%
+  group_by(Protein, ENSEMBL, Symbol, bin) %>%
+  drop_na(bin) %>%
+  summarise(int = log2(median(2^int_core))) %>%
+  drop_na(bin) -> table_proteome_to_RNASeq
+
+write_tsv(as.data.frame(table_proteome_to_RNASeq), "../output/Tables/Proteome_to_RNASeq_9spatialbins.tsv")
+
+
+## -- Ben-Moshe et al., FASC/Proteomics data, 8 spatial clusters
+cat("\014")
+rm(list=ls())
+
+load("../output/variables/d.R")
+load("../output/Variables/SA_incl_all.R")
+load("../output/Variables/meta_pg.R")
+load("../output/Variables/meta_distances_bins.R")
+
+d %>%
+  dplyr::select(cell_ID, int_core, Protein) %>%
+  spread(cell_ID, int_core) %>%
+  gather(cell_ID, int_core, !Protein) %>%
+  mutate(int_core = ifelse(is.na(int_core), 0, int_core)) %>%
+  left_join(meta_pg) %>%
+  left_join(meta_distances_bins %>% rownames_to_column("cell_ID"))%>%
+  group_by(Protein, Symbol, ENSEMBL, bin) %>%
+  summarise(int = log2(median(2^int_core))) %>%
+  drop_na(bin) %>%
+  drop_na(Symbol) -> table_proteome_to_FACS
+
+write_tsv(as.data.frame(table_proteome_to_FACS), "../output/Tables/Proteome_to_FACS_8spatialbins.tsv")
+
+
+## -- Machine learning and proteome prediction, 5 PCA clusters
+cat("\014")
+rm(list=ls())
+
+load("../output/variables/d.R")
+load("../output/Variables/p_bins.R")
+load("../output/Variables/SA_incl_all.R")
+load("../output/Variables/meta_pg.R")
+load("../output/Variables/meta_distances.R")
+
+## Define number of classes
+classes = 5
+##########################
+
+data.frame(cell_ID = rownames(p_bins), pc1 = p_bins$pc1) %>%
+  mutate(range = cut_interval(pc1, n = classes))  -> p_bins_tmp
+
+p_bins_tmp %>%
+  distinct(range) %>%
+  arrange(range) %>%
+  mutate(cluster = c(1:classes)) %>%
+  right_join(p_bins_tmp) %>%
+  right_join(meta_distances) %>%
+  mutate(cluster = abs(cluster - (classes + 1))) %>%
+  dplyr::select(bio_ID, Index, cell_ID, cluster) %>%
+  dplyr::rename(Slide = bio_ID) %>%
+  drop_na(cluster) -> p_bins
+
+write_csv(as.data.frame(p_bins), "../output/Tables/Proteome_to_ML_5PCbins.csv")
