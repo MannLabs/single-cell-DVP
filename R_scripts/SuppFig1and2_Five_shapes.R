@@ -18,6 +18,7 @@ d <- read_tsv("../data/protein/proteintable_fiveshape.tsv") %>%
   mutate(sample = str_replace_all(sample, "_S.*", "")) %>%
   dplyr::select(-file)
 
+write_tsv(d %>% spread(sample, value), file = "../output/Tables/Five-shape-proteome.tsv")
 
 read_tsv("../data/protein/proteintable_fiveshape.tsv") %>%
   drop_na(Protein.Names) %>%
@@ -44,6 +45,11 @@ meta <- read_tsv("../data/meta/meta_fiveshape.txt") %>%
   arrange(sample) %>%
   column_to_rownames("sample")
 
+read_tsv("../data/meta/meta_fiveshape.txt") %>%
+  mutate(included = sample %in% SA_incl) %>%
+  arrange(sample) %>%
+  write_tsv(., file = "../output/Tables/Five-shape-meta.tsv")
+
 d %>%
   filter(sample %in% SA_incl) %>%
   spread(sample, value) %>%
@@ -66,7 +72,7 @@ d %>%
 
 d %>%
   drop_na(value) %>%
-  group_by(sample) %>%
+  group_by(sample) %>%s
   summarise(n = n()) %>%
   summarise(mean = mean(n), median = median(n))
 
@@ -91,6 +97,8 @@ meta %>%
 
 p_cluster <- PCAtools::pca(d_complete, metadata = meta_cluster, removeVar = 0.1)
 
+write_tsv(as.data.frame(p_cluster$rotated) %>% rownames_to_column("sample"), file = "../output/Tables/Five-shape-PC.tsv")
+
 PCAtools::biplot(p_cluster ,
                  colby = 'cluster',
                  colLegendTitle = 'Cluster',
@@ -99,7 +107,7 @@ PCAtools::biplot(p_cluster ,
                  encircleFill = TRUE,
                  hline = 0, vline = c(-25, 0, 25),
                  legendPosition = 'top', legendLabSize = 16, legendIconSize = 8.0,
-                 showLoadings = F, lab = NA)+
+                 showLoadings = T, lab = NA)+
   scale_colour_viridis() -> plot_pca_kmeans
 
 ## Asl
@@ -318,3 +326,8 @@ ggsave(plot_volcano, file = "../output/Figures/Five-shape_Volcano.pdf", width = 
 ggsave(plot_ora_cv, file = "../output/Figures/Five-shape_ORA_CV.pdf", width = 4, height = 3)
 ggsave(plot_ora_pv, file = "../output/Figures/Five-shape_ORA_PV.pdf", width = 4, height = 3)
 ggsave(p_heatmap, file = "../output/Figures/Five-shape_heatmap.pdf", width = 8, height = 8)
+
+## -- Write table
+write_tsv(d_anova_out, file = "../output/Tables/Five-shape-ANOVA.tsv")
+write_tsv(WebGestaltR_ora_cv, file = "../output/Tables/Five-shape-ORA-CV.tsv")
+write_tsv(WebGestaltR_ora_pv, file = "../output/Tables/Five-shape-ORA-PV.tsv")

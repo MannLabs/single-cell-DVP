@@ -24,14 +24,18 @@ median <- statTable_all %>%
   summarise(median = median(n)) %>%
   pull(median)
 
+order_of_measurement <- data.frame(order_ID = c(3,2,1), bio_ID = c("m3B", "m4A", "m5C"))
+
 statTable_all %>%
   mutate(inclusion = cell_ID %in% SA_incl_all) %>%
+  left_join(order_of_measurement) %>%
+  mutate(run_ID = paste(order_ID, run_ID, sep = "_")) %>%
   group_by(cell_ID, label, inclusion, bio_ID, run_ID) %>%
   summarise(n = n()) %>%
   ggplot(aes(x = run_ID, y = n, color = bio_ID, pch = inclusion))+
   geom_point(size = 3)+
   scale_y_continuous(limits = c(0,3000))+
-  theme_bw()+
+  theme_classic()+
   scale_shape_manual(values = c(13, 19)) +
   geom_hline(yintercept = median, lty = "dashed", size = 1) +
   annotate("label", y = 3000, x = 30, label = paste("Median PG:", median)) +

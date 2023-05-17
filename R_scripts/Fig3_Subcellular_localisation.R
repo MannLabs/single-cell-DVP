@@ -2,78 +2,141 @@
 #### scDVP Figure Code ####
 ###########################
 
-#### -- Figure XX -- ####
-
 ## -- Prepare Workspace
 cat("\014")
 rm(list=ls())
 
 ## Read relevant data
 load("../output/variables/d.R")
-load("../output/Variables/meta_distances_bins.R")
+load("../output/Variables/meta_distances.R")
 load("../output/Variables/SA_incl_all.R")
 load("../output/Variables/meta_pg.R")
 
-hpa <- read_csv("../data/external/aal3321_thul_sm_table_s7.csv") %>%
-  filter(`Cell line` == "U-2 OS") %>%
-  dplyr::rename(`Ensembl_human` = `Ensembl id`, Localisation = `IF main protein location`) %>%
-  dplyr::select(`Ensembl_human`, Localisation)
+## Data binning
+classes =20
 
-orthologs <- read_csv("../data/external/diopt_ortholog-mapping.csv") %>%
-  dplyr::rename(Protein = `Search Term`, `Ensembl_human` = `Ensmbl ID  (link HPA)`) %>%
-  dplyr::select(Protein, `Ensembl_human`) %>%
-  left_join(hpa) %>%
-  drop_na(Localisation) %>%
-  distinct(Protein, Localisation)
+data.frame(cell_ID = meta_distances$cell_ID, ratio = meta_distances$ratio) %>%
+  mutate(range = cut_interval(-ratio, n = classes)) -> meta_distances_bin
 
-hpa %>%
-  mutate(Localisation = ifelse(grepl(";", Localisation), "Other", Localisation)) %>%
-  group_by(Localisation) %>%
+SA_incl_heps <- unique(d$cell_ID)
+
+meta_distances_bin %>%
+  filter(cell_ID %in% SA_incl_heps) %>%
+  distinct(range) %>%
+  arrange(range) %>%
+  mutate(bin = c(1:classes)) %>%
+  right_join(meta_distances_bin) %>%
+  mutate(bin = abs(bin - (classes + 1))) -> meta_distances_bin
+
+mitocarta_loc <- read_csv("../data/external/Mouse.MitoCarta3.0_subcellular.csv") %>%
+  dplyr::select(EnsemblGeneID, `HPA_Main_Location_2020 (Reliability)`) %>%
+  dplyr::rename(Compartment = `HPA_Main_Location_2020 (Reliability)`, ENSEMBL = EnsemblGeneID) %>%
+  filter(grepl("Supported|Approved|Enhanced", Compartment)) %>%
+  mutate(Compartment = str_replace_all(Compartment, " \\(.*", "")) %>%
+  separate_rows(Compartment, sep = ";")
+
+mitocarta_loc %>%
+  group_by(Compartment) %>%
   summarise(n = n()) %>%
   slice_max(n, n = 10) %>%
-  pull(Localisation) -> top_10_hpa
+  pull(Compartment) -> top_10_compartments 
 
-hpa %>%
-  mutate(Localisation = ifelse(grepl(";", Localisation), "Other", Localisation)) %>%
-  mutate(COI = Localisation %in% top_10_hpa) %>%
-  mutate(Localisation = ifelse(COI == FALSE, "Other", Localisation)) %>%
-  group_by(Localisation) %>%
-  summarise(n = n(), ratio = n / nrow(.)) %>%
-  mutate(cat = "HPA") -> ratio_hpa
+d %>%
+  left_join(mitocarta_loc) %>%
+  filter(Compartment %in% top_10_compartments) %>%
+  right_join(meta_distances_bin) %>%
+  drop_na(Compartment) %>%
+  group_by(bin, Compartment) %>%
+  summarise(int_sum = sum(int_core)) %>%
+  ungroup() %>%
+  group_by(bin) %>%
+  mutate(int_bin = sum(int_sum)) %>%
+  mutate(ratio = int_sum / int_bin) -> annotations_scDVP
 
-orthologs %>%
-  mutate(Localisation = ifelse(grepl(";", Localisation), "Other", Localisation)) %>%
-  mutate(COI = Localisation %in% top_10_hpa) %>%
-  mutate(Localisation = ifelse(COI == FALSE, "Other", Localisation)) %>%
-  group_by(Localisation) %>%
-  summarise(n = n(), ratio = n / nrow(.)) %>%
-  mutate(cat = "scDVP") -> ratio_scDVP
+annotations_scDVP %>%
+  group_by(Compartment) %>%
+  summarise(mean = mean(ratio))
 
-ggplot(rbind(ratio_scDVP, ratio_hpa), aes(x = cat, y = ratio, fill = fct_reorder(Localisation, ratio, .desc = TRUE))) +
+library_proteome <- read_tsv("../data/external/scDVP_report.pg_matrix.tsv") %>%
+  dplyr::select(-c(2:5)) %>%
+  gather(sample, int, !Protein.Group) %>%
+  group_by(Protein.Group) %>% 
+  summarise(int = median(int, na.rm = T)) %>%
+  mutate(ENSEMBL = mapIds(org.Mm.eg.db,
+                          keys=str_replace_all(Protein.Group, ".*;", ""),
+                          column="ENSEMBL",
+                          keytype="UNIPROT",
+                          multiVals="first")) %>%
+  left_join(mitocarta_loc)
+
+library_proteome %>%
+  filter(Compartment %in% top_10_compartments) %>%
+  drop_na(Compartment) %>%
+  group_by(Compartment) %>%
+  summarise(int = sum(int)) %>%
+  ungroup() %>%
+  mutate(ratio = int / sum(int)) %>%
+  mutate(bin = 0) -> annotations_library
+
+annotations_scDVP %>%
+  full_join(annotations_library) -> annotations_full
+
+ggplot(annotations_full, aes(x = bin, y = ratio, alpha = fct_reorder(Compartment, ratio, .desc = TRUE))) +
+  geom_bar(stat = "identity", fill = viridis(5)[2], color = "grey20") +
+  labs(x = "Category", y = "Value", fill = "Group") +
+  theme_classic()+
+  scale_alpha_manual(values = seq(0,1,by = 0.1)) -> plot_scDVP
+
+ggplot(data = annotations_scDVP %>% group_by(Compartment) %>% mutate(z = scale(ratio)), aes(x = bin, y = z)) + 
+  geom_hline(yintercept = 0, lty = "dotted") +
+  geom_line()+
+  geom_smooth(method = "lm")+
+  facet_wrap(.~Compartment, ncol = 5)+
+  theme_classic() -> plot_lm
+
+ggplot(data = annotations_scDVP, aes(x = bin, y = ratio)) + 
+  geom_line()+
+  geom_smooth(method = "lm")+
+  facet_wrap(.~Compartment, ncol = 5, scales = "free_y")+
+  theme_classic()
+
+annotations_scDVP %>%
+  group_by(Compartment) %>%
+  mutate(z = scale(ratio)) %>%
+  do(model = summary(lm(ratio ~ bin, data = .))) %>%
+  mutate(r.squared = model$r.squared) %>% #-> annotations_scDVP_rsqu
+  mutate(p.value = model$coefficients[,4][2])
+
+## -- Another alternative approach, map from MouseMitocarta 3.0 ;; applied to library proteome
+
+library_proteome <- read_tsv("../data/external/scDVP_report.pg_matrix.tsv") %>%
+  dplyr::select(-c(2:5)) %>%
+  gather(sample, int, !Protein.Group) %>%
+  group_by(Protein.Group) %>% 
+  summarise(int = median(int, na.rm = T)) %>%
+  mutate(ENSEMBL = mapIds(org.Mm.eg.db,
+                          keys=str_replace_all(Protein.Group, ".*;", ""),
+                          column="ENSEMBL",
+                          keytype="UNIPROT",
+                          multiVals="first")) %>%
+  left_join(mitocarta_loc)
+
+library_proteome %>%
+  filter(Compartment %in% top_10_compartments) %>%
+  drop_na(Compartment) %>%
+  group_by(Compartment) %>%
+  summarise(int = sum(int)) %>%
+  ungroup() %>%
+  mutate(ratio = int / sum(int)) -> annotations_library
+
+ggplot(annotations_library, aes(x = 1, y = ratio, fill = fct_reorder(Compartment, ratio, .desc = TRUE))) +
   geom_bar(stat = "identity") +
   labs(x = "Category", y = "Value", fill = "Group") +
   theme_minimal()+
-  scale_fill_manual(values = rev(viridis(10, option = "inferno"))) -> plot_subcellular_bar
+  scale_fill_manual(values = rev(viridis(10, option = "cividis"))) -> plot_library
 
-ggsave(plot_subcellular_bar, file = "../output/Figures/Subcellular_HPA_scDVP.pdf", width = 5, height = 5)
-
-## Subcellular localisation of significant hits
-
-load("../output/Variables/limma_8bins_allproteins.R")
-
-limma_8bins_allproteins %>%
-  left_join(orthologs) %>%
-  drop_na(Localisation) %>%
-  filter(Localisation %in% top_10_hpa) %>%
-  ggplot(aes(x = Localisation, y = B, fill = Localisation))+
-  geom_hline(yintercept = 0, lty = "dotted") + 
-  geom_boxplot()+
-  theme_classic()+
-  scale_fill_manual(values = viridis(12)[2:11]) +
-  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1)) -> plot_effect_size_by_localisation
-
-ggsave(plot_effect_size_by_localisation, file = "../output/Figures/Subcellular_effect_size.pdf", width = 7, height = 5)
-  
-  
-
+## Save plots
+ggsave(plot_library, file = "../output/Figures/Localisation_library.pdf", width = 3, height = 5)
+ggsave(plot_scDVP, file = "../output/Figures/Localisation_scDVP.pdf", width = 11, height = 5)
+ggsave(plot_lm, file = "../output/Figures/Localisation_lm.pdf", width = 8, height = 5
 

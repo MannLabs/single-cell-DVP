@@ -69,3 +69,7 @@ ggsave(plot_pca_geometric_distance, file = "../Output/Figures/PCA_GeometricDista
 
 ## save variables to file
 save(p_bins, file = "../output/variables/p_bins.R")
+
+## -- Write tables
+write_tsv(as.data.frame(p$rotated) %>% rownames_to_column("sample"), file = "../output/Tables/scDVP-PC_samples.tsv")
+write_tsv(as.data.frame(p$loadings) %>% rownames_to_column("Protein"), file = "../output/Tables/scDVP-PC_Proteins.tsv")

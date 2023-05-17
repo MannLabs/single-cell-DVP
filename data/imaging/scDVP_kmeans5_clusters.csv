@@ -1,0 +1,8 @@
+Suppplementary Table S6: kmeans clusters,,,
+"scDVP, Rosenberger et al.",,,
+,,,
+Table,Column,Description,Possible values
+kmeans,cell_ID,Unique sample identifier,
+kmeans,bio_ID,Mouse ID," m1A, m3B, m4A, m5C"
+kmeans,index,"Image ID, can be cross-referenced to images on BioImages",1 - 308
+kmeans,cluster,Computed kmeans cluster,1-5

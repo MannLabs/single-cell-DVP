@@ -10,11 +10,29 @@ rm(list=ls())
 
 ## Read relevant data
 load("../output/variables/d.R")
-load("../output/Variables/meta_distances_bins.R")
+load("../output/Variables/meta_distances.R")
 load("../output/Variables/proteome_90_heps.R")
 load("../output/Variables/limma_8bins_90complete.R")
 
-#load("../output/Variables/")
+# Binning
+classes = 20
+
+## Subset to 90% complete proteins
+SA_incl_heps <- d %>%
+  filter(cell_ID %in% meta_distances$cell_ID) %>%
+  distinct(cell_ID) %>%
+  pull(cell_ID)
+
+data.frame(cell_ID = meta_distances$cell_ID, ratio = meta_distances$ratio) %>%
+  mutate(range = cut_interval(ratio, n = classes))  -> meta_distances_bin
+
+meta_distances_bin %>%
+  filter(cell_ID %in% SA_incl_heps) %>%
+  distinct(range) %>%
+  arrange(range) %>%
+  mutate(bin = c(1:classes)) %>%
+  right_join(meta_distances_bin) %>%
+  filter(cell_ID %in% SA_incl_heps)  -> meta_distances_bin
 
 ## Shapiro-Wilk-Test
 d %>%
@@ -45,8 +63,7 @@ d %>%
   filter(Protein %in% shapiro_top10) %>%
   spread(Protein, int_core) -> d_shapiro_top_10
 
-meta_distances_bins %>%
-  rownames_to_column("cell_ID") %>%
+meta_distances_bin %>%
   left_join(d_shapiro_top_10) %>%
   gather(Protein, int, (ncol(.)-length(shapiro_top10)+1):ncol(.)) %>%
   left_join(limma_8bins_90complete %>% dplyr::select(Protein, logFC)) %>%

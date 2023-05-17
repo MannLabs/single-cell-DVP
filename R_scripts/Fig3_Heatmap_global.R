@@ -75,3 +75,4 @@ pheatmap(scale(t(d_heatmap)),
          cluster_cols = F) -> plot_pheatmap
 
 ggsave(plot_pheatmap, file = "../Output/Figures/Heatmap_liver-zonation.pdf", width = 8, height = 12)
+

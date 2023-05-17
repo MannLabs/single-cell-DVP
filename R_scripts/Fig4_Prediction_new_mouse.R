@@ -66,7 +66,7 @@ d_m1A_norm <- normalize_core(data = d_m1A_priorNorm %>% filter(cell_ID %in% SA_i
   left_join(meta_pg)
 
 # Prediction data
-prediction_m1A <- read_prediction("../data/imaging/shape_probability_m1A.csv", bio_ID = "m1A")
+prediction_m1A <- read_prediction("../output/Tables/shape_probability_m1A.csv", bio_ID = "m1A")
 
 prediction_m1A %>%
   left_join(d_m1A_norm) %>%

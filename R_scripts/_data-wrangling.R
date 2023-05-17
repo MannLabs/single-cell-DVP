@@ -143,3 +143,9 @@ save(img_meta, file = "../Output/Variables/img_meta.R")
 save(img_fluovalues, file = "../Output/Variables/img_fluovalues.R")
 save(d_full_set, file = "../Output/Variables/d_full_set.R")
 save(d, file = "../Output/Variables/d.R")
+
+## -- Write tables
+write_tsv(d %>% dplyr::select(Protein, cell_ID, int_core) %>% spread(cell_ID, int_core), file = "../output/Tables/scDVP_proteome-normalized.tsv")
+write_tsv(img_fluovalues, file = "../output/Tables/scDVP_fluovalues.tsv")
+write.table(proteome_complete_all, file = "../output/Tables/scDVP_core_proteome_all.txt")
+write.table(proteome_complete_heps, file = "../output/Tables/scDVP_core_proteome_heps.txt")
