@@ -61,7 +61,7 @@ Run "_Top_code.R" to execute the entire R code.
 ### Scripts for supplementary figures
 #### Supplementary Figure S1 and S2: Five-shape proteomes
 - [Figure S1 and S2](R_scripts/SuppFig1and2_Five_shapes.R)
-- 
+
 #### Supplementary Figure S3: Performance overview of single shape proteomes
 - [Figure S3a, Labelling efficiency](R_scripts/SuppFig3_Labelling-efficiency.R)
 - [Figure S3b, Area of hepatocytes]()
