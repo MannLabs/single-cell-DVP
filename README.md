@@ -76,7 +76,7 @@ Run "_Top_code.R" to execute the entire R code.
 - [Figure S4c, Distance metric versus PC12](R_scripts/SuppFig4_PCA_vs_geometric-distance.R)
 - [Figure S4d, PCA with loadings](R_scripts/SuppFig4_PCA_Hepatocytes.R)
 - [Figure S4e, PCA including endothelial cells](R_scripts/SuppFig4_PCA_Endothelial.R)
-- 
+
 #### Supplementary Figure S5: Concatentation of shapes
 - [Figure S4](R_scripts/SuppFig5_PCA_reductive.R)
 
@@ -94,7 +94,7 @@ Run "_Top_code.R" to execute the entire R code.
 - [Figure S7d-g, Comparison to FACS-based Proteomics](R_scripts/SuppFig7_Comparison_to_FACS_8_Clusters.R)
 
 #### Supplementart Figure S9
-- [Figure S7d-g, Comparison to FACS-based Proteomics](SuppFig9_PCA_kmeans.R
+- [Figure S7d-g, Comparison to FACS-based Proteomics](SuppFig9_PCA_kmeans.R)
 
 
 ## GitHub Notes
