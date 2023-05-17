@@ -17,17 +17,14 @@ Single-cell proteomics by mass spectrometry (MS) is emerging as a powerful and u
 
 Processed mass spectrometry raw data and other [input](/input/) files have been saved in the following folders:
 
-- [Data - Supplementary_Figure_6](/data/Supplementary_Figure_6)
-
-- (Substructures can be created in this folder. Once this is done, I can create a more detailed overview here for you)
+- [Data and metadata](/data/)
 
 ## Results
 
 Figures and result dataframes are saved in the [output](/output/) folder. 
 
-- [Results - Supplementary_Figure_6](/output/Figures/Supplementary_Figure_6)
-
-- (Substructures can be created in this folder. Once this is done, I can create a more detailed overview here for you)
+- [Results - Figures](/output/Figures/)
+- [Results - Figures](/output/Tables/)
 
 ## R scripts
 
@@ -37,7 +34,8 @@ Figures and result dataframes are saved in the [output](/output/) folder.
 
 ### Scripts for main figures
 #### Figure 2, Depth of single shape proteomes and estimation of nuclear compartment
-- [Figure 2, Intensity of top four histones](R_scripts/Histone-levels.R)
+- [Figure 2a, Abundance range and transcription factors](R_scripts/Rank_versus_Intensity.R)
+- [Figure 2b, Intensity of top four histones](R_scripts/Histone-levels.R)
 
 #### Figure 3, Single shape proteomes are accurate descriptors of zonated hepatocytes
 - [Figure 3a, PCA with distance metric overlay](R_scripts/PCA_vs_geometric-distance.R)
@@ -57,7 +55,6 @@ Figures and result dataframes are saved in the [output](/output/) folder.
 #### Supplementary Figure S3: Performance overview of single shape proteomes
 - [Figure S3a, Labelling efficiency](R_scripts/Labelling-efficiency.R)
 - [Figure S3b, Protein IDs per biological replicate](R_scripts/Protein-IDs_vs_Runs.R)
-- [Figure S3c, Abundance range and transcription factors](R_scripts/ank_versus_Intensity.R)
 - [Figure S3d, Microdissected area versus protein IDs](R_scripts/Protein-IDs_vs_Area.R)
 - [Figure S3e, Data completeness versus intensity](R_scripts/Completeness_vs_Intensity.R)
 - [Figure S3f, Normalization versus CVs](R_scripts/CVs.R)
