@@ -11,7 +11,7 @@ rm(list=ls())
 ## Read relevant data
 load("../output/variables/d.R")
 load("../output/Variables/meta_distances.R")
-load("../output/Variables/limma_8bins_allproteins.R")
+load("../output/Variables/limma_bins_allproteins.R")
 
 ## Define number of classes
 classes =20

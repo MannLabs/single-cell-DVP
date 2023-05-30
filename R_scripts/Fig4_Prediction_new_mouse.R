@@ -15,7 +15,7 @@ source("./Functions/read_prediction.R")
 ## Load relevant data
 load("../Output/variables/meta_pg.R")
 load("../Output/variables/d_classes.R")
-  load("../Output/variables/d_full_set.R")
+load("../Output/variables/d_full_set.R")
 
 ## Read image meta data
 img_meta <- read_csv("../data/meta/meta_img-proteome.csv") %>%
@@ -66,7 +66,7 @@ d_m1A_norm <- normalize_core(data = d_m1A_priorNorm %>% filter(cell_ID %in% SA_i
   left_join(meta_pg)
 
 # Prediction data
-prediction_m1A <- read_prediction("../output/Tables/shape_probability_m1A.csv", bio_ID = "m1A")
+prediction_m1A <- read_prediction("../data/imaging/shape_probability_m1A.csv", bio_ID = "m1A")
 
 prediction_m1A %>%
   left_join(d_m1A_norm) %>%

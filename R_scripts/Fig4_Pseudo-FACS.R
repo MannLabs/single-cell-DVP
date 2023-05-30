@@ -11,12 +11,9 @@ rm(list=ls())
 ## Read relevant data
 load("../output/variables/img_fluovalues.R")
 load("../output/variables/p_bins.R")
-load("../output/variables/meta_distances_bins.R")
+load("../output/variables/meta_distances.R")
 load("../output/variables/SA_incl_all.R")
-
-# meta_binuc <- read_csv("../data/meta_binucleation.csv") %>%
-#   filter(is.na(Notes) & (Classification == "Binuc" | Classification == "Mono"))  %>%
-#   mutate(cell_ID = str_replace(cell_ID, "Dimethyl-n-", "target"))
+load("../output/variables/d.R")
 
 ## Additional function
 scale_df<- function(x){
@@ -56,8 +53,27 @@ p_bins %>%
 ggsave(plot_fluo_by_proteome_bin, file = "../Output/Figures/Proteome-bin_vs_fluorescence.pdf", width = 6, height = 5)
 
 # - Staining intensity by spatial cluster
-meta_distances_bins %>%
-  rownames_to_column("cell_ID") %>%
+# Binning
+classes = 8
+
+## Subset to 90% complete proteins
+SA_incl_heps <- d %>%
+  filter(cell_ID %in% meta_distances$cell_ID) %>%
+  distinct(cell_ID) %>%
+  pull(cell_ID)
+
+data.frame(cell_ID = meta_distances$cell_ID, ratio = meta_distances$ratio) %>%
+  mutate(range = cut_interval(ratio, n = classes))  -> meta_distances_bin
+
+meta_distances_bin %>%
+  filter(cell_ID %in% SA_incl_heps) %>%
+  distinct(range) %>%
+  arrange(range) %>%
+  mutate(bin = c(1:classes)) %>%
+  right_join(meta_distances_bin) %>%
+  filter(cell_ID %in% SA_incl_heps)  -> meta_distances_bin
+
+meta_distances_bin %>%
   left_join(img_fluovalues) %>%
   filter(Channel == "Alexa647" | Channel == "Alexa568") %>%
   group_by(Channel, bio_ID) %>%
@@ -71,6 +87,7 @@ meta_distances_bins %>%
   labs(x = "Proteome group", y = "Scaled fluorescence intensity") -> plot_fluo_by_spatial_bin
 
 ggsave(plot_fluo_by_spatial_bin, file = "../Output/Figures/Spatial-bin_vs_fluorescence.pdf", width = 6, height = 5)
+
 # 
 # # - Size of hepatocytes as histogram
 # img_fluovalues %>%

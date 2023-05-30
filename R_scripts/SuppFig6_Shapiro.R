@@ -12,7 +12,7 @@ rm(list=ls())
 load("../output/variables/d.R")
 load("../output/Variables/meta_distances.R")
 load("../output/Variables/proteome_90_heps.R")
-load("../output/Variables/limma_8bins_90complete.R")
+load("../output/Variables/limma_bins_allproteins.R")
 
 # Binning
 classes = 20

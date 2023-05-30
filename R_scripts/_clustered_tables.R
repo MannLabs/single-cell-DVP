@@ -10,11 +10,11 @@ rm(list=ls())
 load("../output/variables/d.R")
 load("../output/Variables/SA_incl_all.R")
 load("../output/Variables/meta_pg.R")
-load("../output/Variables/meta_distances_bins.R")
+load("../output/Variables/meta_distances.R")
 
 classes = 9
 
-data.frame(cell_ID = rownames(meta_distances_bins), ratio = meta_distances_bins$ratio) %>%
+data.frame(cell_ID =meta_distances$cell_ID, ratio = meta_distances$ratio) %>%
   mutate(range = cut_interval(ratio, n = classes))  -> distance_bins_tmp
 
 distance_bins_tmp %>%
@@ -49,7 +49,22 @@ rm(list=ls())
 load("../output/variables/d.R")
 load("../output/Variables/SA_incl_all.R")
 load("../output/Variables/meta_pg.R")
-load("../output/Variables/meta_distances_bins.R")
+load("../output/Variables/meta_distances.R")
+
+classes = 8
+
+data.frame(cell_ID =meta_distances$cell_ID, ratio = meta_distances$ratio) %>%
+  mutate(range = cut_interval(ratio, n = classes))  -> distance_bins_tmp
+
+distance_bins_tmp %>%
+  filter(cell_ID %in% SA_incl_all) %>%
+  distinct(range) %>%
+  arrange(range) %>%
+  mutate(bin = c(1:classes)) %>%
+  right_join(distance_bins_tmp) %>%
+  filter(cell_ID %in% SA_incl_all) %>%
+  column_to_rownames("cell_ID") %>%
+  mutate(bin = abs(bin - (classes + 1))) -> distance_bins
 
 d %>%
   dplyr::select(cell_ID, int_core, Protein) %>%
@@ -57,7 +72,7 @@ d %>%
   gather(cell_ID, int_core, !Protein) %>%
   mutate(int_core = ifelse(is.na(int_core), 0, int_core)) %>%
   left_join(meta_pg) %>%
-  left_join(meta_distances_bins %>% rownames_to_column("cell_ID"))%>%
+  left_join(distance_bins %>% rownames_to_column("cell_ID"))%>%
   group_by(Protein, Symbol, ENSEMBL, bin) %>%
   summarise(int = log2(median(2^int_core))) %>%
   drop_na(bin) %>%
