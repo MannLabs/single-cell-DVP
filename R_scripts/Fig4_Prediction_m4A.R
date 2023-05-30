@@ -2,7 +2,13 @@
 #### scDVP Figure Code ####
 ###########################
 
-#### -- Figure XX -- ####
+#### -- Figure 4F -- ####
+
+library(XML)
+library(sf)
+library(RColorBrewer)
+library(ggpubr)
+library(platetools)
 
 ## -- Prepare Workspace
 cat("\014")
@@ -12,7 +18,7 @@ rm(list=ls())
 source("./Functions/fct_xml_to_polygon.R")
 load("../output/variables/d_classes.R")
 
-prediction_m4A <- read_csv("../output/Tables/shape_probability_m4A.csv") %>%
+prediction_m4A <- read_csv("../data/imaging/shape_probability_m4A.csv") %>%
   dplyr::select(-1) %>%
   dplyr::rename(Index = `Shape Index`) %>%
   gather(cluster, probability, 1:5) %>%
@@ -24,12 +30,6 @@ prediction_m4A <- read_csv("../output/Tables/shape_probability_m4A.csv") %>%
   mutate(int_weighted = sum(median_weighted)) %>%
   mutate(bio_ID = "m4A")
 
-library(XML)
-library(sf)
-library(RColorBrewer)
-library(ggpubr)
-library(platetools)
-
 polygons_m4A <- xml_to_polygon("../data/imaging/EXP-221117_scDVP_m4A_PREDICTION_237.xml")
 
 level_of <- data.frame(Index = c(1:length(polygons_m4A))) %>%
@@ -38,7 +38,6 @@ level_of <- data.frame(Index = c(1:length(polygons_m4A))) %>%
   distinct(Index, .keep_all = T)
 
 st_sf(polygons_m4A, ID = as.factor(c(1:length(polygons_m4A))), level_of) %>%
-  
   ggplot()+
   geom_sf(aes(fill = log2(int_weighted)))+
   scale_fill_viridis_c()+
@@ -73,7 +72,6 @@ level_of <- data.frame(Index = c(1:length(polygons_m4A))) %>%
   distinct(Index, .keep_all = T)
 
 st_sf(polygons_m4A, ID = as.factor(c(1:length(polygons_m4A))), level_of) %>%
-  
   ggplot()+
   geom_sf(aes(fill = log2(int_weighted)))+
   scale_fill_viridis_c()+

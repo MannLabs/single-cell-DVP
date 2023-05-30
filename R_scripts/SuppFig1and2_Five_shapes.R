@@ -2,7 +2,7 @@
 #### scDVP Figure Code ####
 ###########################
 
-#### -- Figure XX -- ####
+#### -- Supplementary Figure S1 and S2 -- ####
 
 ## -- Prepare Workspace
 cat("\014")
@@ -72,7 +72,7 @@ d %>%
 
 d %>%
   drop_na(value) %>%
-  group_by(sample) %>%s
+  group_by(sample) %>%
   summarise(n = n()) %>%
   summarise(mean = mean(n), median = median(n))
 

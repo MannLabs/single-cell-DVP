@@ -2,7 +2,7 @@
 ##### Description ######
 ########################
 
-# This script contains all analyses of Supplementary Figure 6:
+# This script contains all analyses of Supplementary Figure 7:
 # Integration of DVP and FACS sorted proteomics data by Ben-Moshe, Nat Meta 2019
 
 ## Prepare Workspace ##

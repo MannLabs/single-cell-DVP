@@ -2,6 +2,8 @@
 #### scDVP Figure Code ####
 ###########################
 
+## -- Figure 3G, Supplementary Figure S8 -- ##
+
 ## -- Prepare Workspace
 cat("\014")
 rm(list=ls())
@@ -138,5 +140,5 @@ ggplot(annotations_library, aes(x = 1, y = ratio, fill = fct_reorder(Compartment
 ## Save plots
 ggsave(plot_library, file = "../output/Figures/Localisation_library.pdf", width = 3, height = 5)
 ggsave(plot_scDVP, file = "../output/Figures/Localisation_scDVP.pdf", width = 11, height = 5)
-ggsave(plot_lm, file = "../output/Figures/Localisation_lm.pdf", width = 8, height = 5
+ggsave(plot_lm, file = "../output/Figures/Localisation_lm.pdf", width = 8, height = 5)
 

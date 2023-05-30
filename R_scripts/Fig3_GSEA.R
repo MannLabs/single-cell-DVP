@@ -2,7 +2,7 @@
 #### scDVP Figure Code ####
 ###########################
 
-#### -- Figure XX -- ####
+#### -- Figure 3F -- ####
 
 ## -- Prepare Workspace
 cat("\014")
@@ -42,7 +42,7 @@ d %>%
   column_to_rownames("Protein") %>%
   filter(rowSums(is.na(.)) / ncol(.) <= 0.5) -> d_wide_70
   
-decision_webgestalt <- 2
+decision_webgestalt <- 1
 
 if(decision_webgestalt == 1){
   for(i in c(1:max(meta_distances_bins$bin))){

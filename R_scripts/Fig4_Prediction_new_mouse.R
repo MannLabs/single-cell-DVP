@@ -2,7 +2,7 @@
 #### scDVP Figure Code ####
 ###########################
 
-#### -- Figure XX -- ####
+#### -- Figure 4E -- ####
 
 ## -- Prepare Workspace
 cat("\014")

@@ -2,8 +2,6 @@
 #### scDVP Figure Code ####
 ###########################
 
-#### -- Figure XX -- ####
-
 ## -- Prepare Workspace
 cat("\014")
 rm(list=ls())
@@ -50,7 +48,7 @@ limma_bins_allproteins <- topTable(fit, number = Inf, confint = TRUE, coef = 2, 
   left_join(meta_pg)
 
 ## Save variables
-save(limma_bins_allproteins, file = "../output/Variables/limma_8bins_allproteins.R")
+save(limma_bins_allproteins, file = "../output/Variables/limma_bins_allproteins.R")
 
 ## -- Write tables
 write_tsv(limma_bins_allproteins, file = "../output/Tables/scDVP_ANOVA.tsv")

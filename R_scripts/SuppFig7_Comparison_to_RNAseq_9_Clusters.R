@@ -2,7 +2,7 @@
 ##### Description ######
 ########################
 
-# This script contains all analyses of Supplementary Figure 6:
+# This script contains all analyses of Supplementary Figure 7:
 # Integration of DVP and scRNAseq data by Halpern et al., Nature 2017
 
 ## Prepare Workspace ##

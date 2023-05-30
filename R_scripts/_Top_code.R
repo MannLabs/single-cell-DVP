@@ -99,12 +99,5 @@ source("./Fig4_Prediction_class_proteomes.R")
 source("./Fig4_Prediction_new_mouse.R")
 source("./Fig4_Prediction_m4A.R")
 
-# Supplementary Figure 8
-source("./SuppFig8_PCA_kmeans.R")
-
-
-
-
-
-
-
+# Supplementary Figure 9
+source("./SuppFig9_PCA_kmeans.R")

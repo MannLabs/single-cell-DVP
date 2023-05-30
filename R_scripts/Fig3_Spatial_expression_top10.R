@@ -2,7 +2,7 @@
 #### scDVP Figure Code ####
 ###########################
 
-#### -- Figure XX -- ####
+#### -- Figure 3E -- ####
 
 ## -- Prepare Workspace
 cat("\014")
@@ -29,7 +29,7 @@ meta_distances_bin %>%
   right_join(meta_distances_bin) %>%
   mutate(bin = abs(bin - (classes + 1))) -> meta_distances_bin
 
-limma_8bins_allproteins %>%
+limma_bins_allproteins %>%
   mutate(direction = logFC > 0) %>%
   group_by(direction) %>%
   slice_min(adj.P.Val, n = 10) %>%
@@ -47,7 +47,7 @@ d %>%
 meta_distances_bin %>%
   left_join(d_top_10) %>%
   gather(Symbol, int, (ncol(.)-nrow(proteome_top_10)+1):ncol(.)) %>%
-  left_join(limma_8bins_allproteins %>% dplyr::select(Symbol, logFC)) %>%
+  left_join(limma_bins_allproteins %>% dplyr::select(Symbol, logFC)) %>%
   mutate(zonated = ifelse(logFC > 0, "PV", "CV")) %>%
   replace(is.na(.), 0) %>%
   mutate(int = 2^int) %>%

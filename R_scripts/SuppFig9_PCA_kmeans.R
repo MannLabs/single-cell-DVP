@@ -2,7 +2,7 @@
 #### scDVP Figure Code ####
 ###########################
 
-#### -- Figure XX -- ####
+#### -- Supplementary Figure S9 -- ####
 
 ## -- Prepare Workspace
 cat("\014")
@@ -10,66 +10,28 @@ rm(list=ls())
 
 ## Read relevant data
 load("../output/variables/d_complete_heps.R")
-load("../output/Variables/statTable_all.R")
-load("../output/Variables/meta_distances.R")
-load("../output/Variables/d.R")
-load("../output/Variables/SA_incl_all.R")
-load("../output/Variables/p_heps.R")
-# # load("../output/Variables/meta_pg.R")
-# # source("./Functions/scale_dplyr.R")
-# 
-# # library(kpodclustr)
-# # 
-# # d %>%
-# #   filter(cell_ID %in% SA_incl_all) %>%
-# #   dplyr::select(cell_ID, int_core, Protein) %>%
-# #   spread(cell_ID, int_core) %>%
-# #   column_to_rownames("Protein") -> d_wide
-# # 
-# # kpod <- kpod(as.matrix(t(d_wide)), k = 5)
-# # 
-# # clusters_heps <- as.data.frame(kpod[["cluster"]])%>%
-# #   rownames_to_column("cell_ID")
-# # colnames(clusters_heps)[2] = "cluster"
-# 
-# ## Export clusters for ML training
-# 
-# classes = 5
-# 
-# data.frame(cell_ID = p_heps$yvars, pc1 = p_heps$rotated$PC1, pc2 = p_heps$rotated$PC2) %>%
-#   mutate(range = cut_interval(pc1, n = classes))  -> p_bins_5_tmp
-# 
-# p_bins_5_tmp %>%
-#   distinct(range) %>%
-#   arrange(range) %>%
-#   mutate(bin = c(1:classes)) %>%
-#   right_join(p_bins_5) %>%
-#   #column_to_rownames("cell_ID") %>%
-#   mutate(bin = abs(bin - (classes + 1))) %>%
-#   dplyr::rename(cluster = bin) -> p_bins_5
-# 
-# 
-# test <- read_csv("../data/old_stuff/_221115_scDVP_5_clusters.csv")
+meta_heps_cluster <- read_csv("../data/imaging/scDVP_kmeans5_clusters.csv") %>%
+  filter(cell_ID %in% colnames(d_complete_heps))
 
 ## K-means clustering
-set.seed(27)
-
-clusters_heps <- as.data.frame(kmeans(t(d_complete_heps), centers = 5, iter.max = 1000, nstart = 50)[["cluster"]]) %>%
-  rownames_to_column("cell_ID")
-
-colnames(clusters_heps)[2] = "cluster"
-
-statTable_all %>%
-  distinct(bio_ID, label, cell_ID, run_ID, heps) %>%
-  filter(cell_ID %in% colnames(d_complete_heps)) %>%
-  arrange(cell_ID) %>%
-  left_join(meta_distances) %>%
-  mutate(run_number = as.numeric(str_replace(run_ID, ".*_", ""))) %>%
-  drop_na(ratio) %>%
-  left_join(clusters_heps) %>%
-  dplyr::rename(Slide = bio_ID) %>%
-  dplyr::select(Slide, Index, cell_ID, cluster) %>%
-  mutate(cluster = ifelse(cluster == 2, 3, ifelse(cluster == 3, 2, cluster)))   -> meta_heps_cluster
+# set.seed(27)
+# 
+# clusters_heps <- as.data.frame(kmeans(t(d_complete_heps), centers = 5, iter.max = 1000, nstart = 50)[["cluster"]]) %>%
+#   rownames_to_column("cell_ID")
+# 
+# colnames(clusters_heps)[2] = "cluster"
+# 
+# statTable_all %>%
+#   distinct(bio_ID, label, cell_ID, run_ID, heps) %>%
+#   filter(cell_ID %in% colnames(d_complete_heps)) %>%
+#   arrange(cell_ID) %>%
+#   left_join(meta_distances) %>%
+#   mutate(run_number = as.numeric(str_replace(run_ID, ".*_", ""))) %>%
+#   drop_na(ratio) %>%
+#   left_join(clusters_heps) %>%
+#   dplyr::rename(Slide = bio_ID) %>%
+#   dplyr::select(Slide, Index, cell_ID, cluster) %>%
+#   mutate(cluster = ifelse(cluster == 2, 3, ifelse(cluster == 3, 2, cluster))) -> meta_heps_cluster
 
 meta_heps_cluster %>%
   column_to_rownames("cell_ID") -> meta_heps_cluster_pca

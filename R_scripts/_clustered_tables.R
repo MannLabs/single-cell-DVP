@@ -78,7 +78,6 @@ load("../output/Variables/meta_distances.R")
 
 ## Define number of classes
 classes = 5
-##########################
 
 data.frame(cell_ID = rownames(p_bins), pc1 = p_bins$pc1) %>%
   mutate(range = cut_interval(pc1, n = classes))  -> p_bins_tmp
