@@ -80,7 +80,7 @@ Run "_Top_code.R" to execute the entire R code.
 - [Figure S4e, PCA including endothelial cells](R_scripts/SuppFig4_PCA_Endothelial.R)
 
 #### Supplementary Figure S5: Concatentation of shapes
-- [Figure S4](R_scripts/SuppFig5_PCA_reductive.R)
+- [Figure S5, Reductive PCA](R_scripts/SuppFig5_PCA_reductive.R)
 
 #### Supplementary Figure S6: Normality checks of single shape data
 - [Figure S5a, Volcano plot](R_scripts/SuppFig6_Volcano_plot.R)
