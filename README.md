@@ -6,6 +6,8 @@ Florian Rosenberger et al., 2023 - in revision
 
 Single-cell proteomics by mass spectrometry (MS) is emerging as a powerful and unbiased method for the characterization of biological heterogeneity. So far, it has been limited to cultured cells, whereas an expansion of the method to complex tissues would greatly enhance biological insights. Here we describe single-cell Deep Visual Proteomics (scDVP), a technology that integrates high-content imaging, laser microdissection and multiplexed MS. scDVP resolves the context-dependent, spatial proteome of murine hepatocytes at a current depth of 1,700 proteins from a slice of a cell. Half of the proteome was differentially regulated in a spatial manner, with protein levels changing dramatically in proximity to the central vein. We applied machine learning to proteome classes and images, which subsequently inferred the spatial proteome from imaging data alone. scDVP is applicable to healthy and diseased tissues and complements other spatial proteomics or spatial omics technologies.
 
+![Liver painting](https://github.com/MannLabs/single-cell-DVP/blob/main/data/imaging/liver_stain.PNG)
+
 ## Table of contents
 
 1. [Data repository](#Data-repository)
@@ -24,7 +26,7 @@ Processed mass spectrometry raw data and other input files have been saved in th
 Figures and result dataframes are saved in the [output](/output/) folder. 
 
 - [Results - Figures](/output/Figures/)
-- [Results - Figures](/output/Tables/)
+- [Results - Tables](/output/Tables/)
 
 ## R scripts
 
@@ -85,16 +87,15 @@ Run "_Top_code.R" to execute the entire R code.
 - [Figure S5b, Shapiro-Wilk-Test](R_scripts/Shapiro.R)
 - [Figure S5d, Relative expression of bottom-10 differential proteins](R_scripts/Shapiro.R)
 
-
-#### Supplementary Figure S7: Additional data on subcellular localisation
-- [Figure S7, Linear models](R_scripts/Fig3_Subcellular_localisation.R)
-
-#### Supplementart Figure S8
+#### Supplementart Figure S7
 - [Figure S7a-c, Comparison to RNAseq](R_scripts/SuppFig7_Comparison_to_RNAseq_9_Clusters.R)
 - [Figure S7d-g, Comparison to FACS-based Proteomics](R_scripts/SuppFig7_Comparison_to_FACS_8_Clusters.R)
 
+#### Supplementary Figure S8: Additional data on subcellular localisation
+- [Figure S8, Linear models](R_scripts/Fig3_Subcellular_localisation.R)
+
 #### Supplementart Figure S9
-- [Figure S7d-g, Comparison to FACS-based Proteomics](SuppFig9_PCA_kmeans.R)
+- [Figure S9, Machine learning](SuppFig9_PCA_kmeans.R)
 
 
 ## GitHub Notes
